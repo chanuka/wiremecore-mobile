@@ -35,5 +35,6 @@ public class EmailConfig {
         properties.put("mail.smtp.ssl.trust", host);
 
         return javaMailSender;
+
     }
 }
