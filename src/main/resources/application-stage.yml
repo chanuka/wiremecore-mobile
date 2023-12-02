@@ -1,0 +1,89 @@
+spring:
+  #  cache:
+  #    redis:
+  #      host: localhost
+  #      port: 6379
+  ##      time-to-live: 100S
+  #    type: redis
+  messages:
+    basename: messages
+    encoding: UTF-8
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        show_sql: true
+        jdbc:
+          batch_size: 50
+  datasource:
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?createDatabaseIfNotExist=true
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+  mail:
+    default-encoding: UTF-8
+    host: smtp.gmail.com
+    port: 587
+    username: chanuucsc@gmail.com
+    password: dlmfklwnyonycsta
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+    protocol: smtp
+    test-connection: false
+
+application:
+  jwt:
+    secretKey: securesecuresecuresecuresecuresecuresecuresecuresecuresecuresecure
+    tokenPrefix: Bearer
+    tokenExpirationAfterMillis: 84400000
+  refresh:
+    tokenExpirationAfterMillis: 120000
+  resource:
+    devices: devices
+    deviceconfig: deviceconfig
+    device_model: devicemodel
+    device_vendor: devicevendor
+    users: users
+    roles: roles
+    terminals: terminals
+    partners: partners
+    merchants: merchants
+    resources: resources
+    userroles: userroles
+    permissions: permissions
+    transactions: transactions
+
+rsa:
+  private-key: classpath:certs/private.pem
+  public-key: classpath:certs/public.pem
+
+springdoc:
+  api-docs:
+    path: /swagger-doc
+  show-login-endpoint: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    default-models-expand-depth: -1
+
+swagger:
+  server:
+    url: http://123.231.95.112:8091/wireme-coreweb
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: httpexchanges,health,info,metrics,env,loggers
+    enabled-by-default: true
+
+logging:
+  config: /opt/conf/wiremecoreweb/logback-spring.xml

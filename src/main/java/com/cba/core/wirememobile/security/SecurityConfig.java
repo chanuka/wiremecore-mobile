@@ -1,0 +1,116 @@
+package com.cba.core.wirememobile.security;
+
+import com.cba.core.wirememobile.config.JwtConfig;
+import com.cba.core.wirememobile.exception.AuthEntryPoint;
+import com.cba.core.wirememobile.filter.AuthTokenVerifyFilter;
+import com.cba.core.wirememobile.filter.CustomLogoutHandler;
+import com.cba.core.wirememobile.filter.UserNamePasswordVerifyFilter;
+import com.cba.core.wirememobile.service.impl.CustomUserDetailsServiceImpl;
+import com.cba.core.wirememobile.service.impl.PermissionServiceImpl;
+import com.cba.core.wirememobile.service.impl.RefreshTokenServiceImpl;
+import com.cba.core.wirememobile.service.impl.TokenBlacklistServiceImpl;
+import com.cba.core.wirememobile.util.JwtUtil;
+import com.cba.core.wirememobile.util.UserBeanUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+@Profile(value = {"dev", "stage"})
+public class SecurityConfig {
+
+    private final CustomUserDetailsServiceImpl customUserDetailsService;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtConfig jwtConfig;
+    private final RefreshTokenServiceImpl refreshTokenService;
+    private final PermissionServiceImpl permissionService;// autowired not worked in the context of creating new object using new key word, has to manually inject.
+    private final JwtUtil jwtUtil;
+    private final JwtEncoder encoder;
+    private final JwtDecoder decoder;
+    private final UserBeanUtil userBeanUtil;
+    private final TokenBlacklistServiceImpl tokenBlacklistService;
+    private final CustomLogoutHandler customLogoutHandler;
+    private final MessageSource messageSource;
+
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(customUserDetailsService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder);
+        return authenticationProvider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("*"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setExposedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
+    public SecurityFilterChain configure(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults())
+                .exceptionHandling()
+                .authenticationEntryPoint(new AuthEntryPoint())
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .logout()
+                .logoutUrl("/logout")
+                .addLogoutHandler(customLogoutHandler)
+                .and()
+                .authorizeHttpRequests(authorize -> {
+                    authorize.requestMatchers("/").permitAll();
+                    authorize.requestMatchers("/refreshtoken").permitAll();
+                    authorize.requestMatchers("/transactions/**").permitAll();
+                    authorize.requestMatchers("/swagger-doc/**").permitAll();
+                    authorize.requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll();
+                    authorize.requestMatchers("/actuator/**").permitAll()
+                            .anyRequest().authenticated();
+                });
+//                .httpBasic();
+//        http.authenticationProvider(authenticationProvider()); // no need, auto detect
+
+        http.addFilter(new UserNamePasswordVerifyFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)),
+                jwtConfig, refreshTokenService, customUserDetailsService, jwtUtil, encoder));
+        http.addFilterAfter(new AuthTokenVerifyFilter(jwtConfig, jwtUtil, permissionService, decoder, userBeanUtil, tokenBlacklistService, messageSource), UserNamePasswordVerifyFilter.class);
+
+        return http.build();
+    }
+}

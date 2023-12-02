@@ -1,0 +1,90 @@
+spring:
+#  cache:
+#    redis:
+#      host: localhost
+#      port: 6379
+##      time-to-live: 100S
+#    type: redis
+  messages:
+    basename: messages
+    encoding: UTF-8
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        show_sql: true
+        jdbc:
+          batch_size: 50
+  datasource:
+    url: jdbc:mysql://localhost:3306/haradb_new?serverTimezone=UTC&cachePrepStmts=true&useServerPrepStmts=true&rewriteBatchedStatements=true
+    username: root
+    password: password
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+  mail:
+    default-encoding: UTF-8
+    host: smtp.gmail.com
+    port: 587
+    username: chanuucsc@gmail.com
+    password: dlmfklwnyonycsta
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true # this should change to false when there is no SSL
+            required: true
+    protocol: smtp
+    test-connection: false
+
+application:
+  jwt:
+    secretKey: securesecuresecuresecuresecuresecuresecuresecuresecuresecuresecure
+    tokenPrefix: Bearer
+    tokenExpirationAfterMillis: 604800000       #86400000,3600000,60,000  Token is issued for a week, has to change once go live
+  refresh:
+    tokenExpirationAfterMillis: 120000
+  resource:
+    devices: devices
+    deviceconfig: deviceconfig
+    device_model: devicemodel
+    device_vendor: devicevendor
+    users: users
+    roles: roles
+    terminals: terminals
+    partners: partners
+    merchants: merchants
+    resources: resources
+    userroles: userroles
+    permissions: permissions
+    transactions: transactions
+
+rsa:
+  private-key: classpath:certs/private.pem
+  public-key: classpath:certs/public.pem
+
+springdoc:
+  api-docs:
+    path: /swagger-doc
+  show-login-endpoint: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    default-models-expand-depth: -1  # this is to remove unwanted tables view in swagger-ui
+
+swagger:
+  server:
+    url: http://localhost:8091/wireme-coreweb
+
+# this is to activate spring actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: httpexchanges,health,info,metrics,env,loggers
+    enabled-by-default: true
+
+logging:
+  config: C:\conf\wiremecoreweb\logback-spring.xml
