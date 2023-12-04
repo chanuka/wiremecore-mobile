@@ -1,12 +1,13 @@
 package com.cba.core.wirememobile.util;
 
-public enum UserTypeEnum {
+public enum DeviceTypeEnum {
     WEB(1),
-    MPOS(2);
+    MPOS(2),
+    EDC_POS(3);
 
     private final int value;
 
-    UserTypeEnum(int value) {
+    DeviceTypeEnum(int value) {
         this.value = value;
     }
 

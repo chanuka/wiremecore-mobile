@@ -2,6 +2,8 @@ package com.cba.core.wirememobile.filter;
 
 import com.cba.core.wirememobile.config.JwtConfig;
 import com.cba.core.wirememobile.dto.UsernameAndPasswordAuthenticationRequestDto;
+import com.cba.core.wirememobile.exception.AppSignAuthException;
+import com.cba.core.wirememobile.exception.DeviceAuthException;
 import com.cba.core.wirememobile.model.TokenRefresh;
 import com.cba.core.wirememobile.service.CustomUserDetailsService;
 import com.cba.core.wirememobile.service.RefreshTokenService;
@@ -13,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -39,8 +42,13 @@ public class UserNamePasswordVerifyFilter extends UsernamePasswordAuthentication
         try {
             logger.debug("CustomUserNamePasswordFilter called--");
 
-            UsernameAndPasswordAuthenticationRequestDto authenticationRequest = new ObjectMapper()
-                    .readValue(request.getInputStream(), UsernameAndPasswordAuthenticationRequestDto.class);
+            UsernameAndPasswordAuthenticationRequestDto authenticationRequest = null;
+            try {
+                authenticationRequest = new ObjectMapper()
+                        .readValue(request.getInputStream(), UsernameAndPasswordAuthenticationRequestDto.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
 //            Authentication authentication = new UsernamePasswordAuthenticationToken(
 //                    authenticationRequest.getUsername(),
@@ -51,14 +59,32 @@ public class UserNamePasswordVerifyFilter extends UsernamePasswordAuthentication
                     authenticationRequest.getPassword()
             );
 
-            authRequest.setDetails(authenticationRequest);
-
+            authRequest.setDetails(authenticationRequest); // set user object for future usage - optional
 
             Authentication authenticate = authenticationManager.authenticate(authRequest);
+            /**
+             * if the user credentials are validated only, below validation will be processed
+             */
+            customUserDetailsService.validateUserDevice(authenticationRequest);
+
+
             return authenticate;
-        } catch (Exception e) {
+
+        } catch (BadCredentialsException e) {
+            request.setAttribute("errorObject", e);
+            request.setAttribute("errorCode", "BadCredentialsException");
             logger.error(e.getMessage());
-            throw new RuntimeException(e);
+            throw e;
+        } catch (DeviceAuthException de) {
+            request.setAttribute("errorObject", de);
+            request.setAttribute("errorCode", "DeviceAuthException");
+            logger.error(de.getMessage());
+            throw de;
+        } catch (AppSignAuthException ae) {
+            request.setAttribute("errorObject", ae);
+            request.setAttribute("errorCode", "AppSignAuthException");
+            logger.error(ae.getMessage());
+            throw ae;
         }
     }
 
@@ -68,8 +94,6 @@ public class UserNamePasswordVerifyFilter extends UsernamePasswordAuthentication
                                             FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
 
-        UsernameAndPasswordAuthenticationRequestDto userDto = (UsernameAndPasswordAuthenticationRequestDto) authResult.getDetails();
-        System.out.println("deviceSerial:" + customUserDetailsService.validateUserDevice(userDto));
 
         String token = jwtUtil.generateTokenFromAuthResult(authResult, encoder);
         TokenRefresh refreshToken = refreshTokenService.createRefreshToken(authResult.getName());

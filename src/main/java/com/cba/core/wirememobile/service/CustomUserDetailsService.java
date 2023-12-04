@@ -1,16 +1,16 @@
 package com.cba.core.wirememobile.service;
 
 import com.cba.core.wirememobile.dto.UsernameAndPasswordAuthenticationRequestDto;
+import com.cba.core.wirememobile.exception.AppSignAuthException;
+import com.cba.core.wirememobile.exception.DeviceAuthException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import java.io.IOException;
 
 public interface CustomUserDetailsService extends UserDetailsService {
 
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 
-    boolean validateUserDevice(UsernameAndPasswordAuthenticationRequestDto userDto) throws IOException;
+    boolean validateUserDevice(UsernameAndPasswordAuthenticationRequestDto userDto) throws DeviceAuthException, AppSignAuthException;
 
 }

@@ -40,7 +40,7 @@ public class User implements java.io.Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_type", nullable = false)
     private UserType userType;
-    @JoinColumn(name = "name", nullable = true)
+    @JoinColumn(name = "name", nullable = false)
     private String name;
     @Column(name = "user_name", nullable = false, length = 45)
     private String userName;
@@ -48,6 +48,8 @@ public class User implements java.io.Serializable {
     private String password;
     @Column(name = "email", length = 50)
     private String email;
+    @Column(name = "first_login", nullable = false)
+    private Integer firstLogin = 0;
     @Column(name = "contact_no", length = 12)
     private String contactNo;
     @Temporal(TemporalType.TIMESTAMP)

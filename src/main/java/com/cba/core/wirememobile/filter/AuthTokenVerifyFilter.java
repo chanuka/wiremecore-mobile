@@ -8,7 +8,7 @@ import com.cba.core.wirememobile.service.PermissionService;
 import com.cba.core.wirememobile.service.TokenBlacklistService;
 import com.cba.core.wirememobile.util.JwtUtil;
 import com.cba.core.wirememobile.util.UserBeanUtil;
-import com.cba.core.wirememobile.util.UserTypeEnum;
+import com.cba.core.wirememobile.util.DeviceTypeEnum;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -70,7 +70,7 @@ public class AuthTokenVerifyFilter extends OncePerRequestFilter {
             userBeanUtil.setUsername(username); // set user data in request scope for db updating
             userBeanUtil.setRemoteAdr(request.getRemoteAddr()); // set remote address in request scope for db updating
 
-            if (!validity.equals(String.valueOf(UserTypeEnum.MPOS.getValue()))) {
+            if (!validity.equals(String.valueOf(DeviceTypeEnum.MPOS.getValue()))) {
                 throw new JwtTokenException(token, messageSource.getMessage("GLOBAL_TOKEN_MODULE_ERROR", null, currentLocale));
             }
 
