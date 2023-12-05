@@ -43,17 +43,11 @@ public class UserNamePasswordVerifyFilter extends UsernamePasswordAuthentication
             logger.debug("CustomUserNamePasswordFilter called--");
 
             UsernameAndPasswordAuthenticationRequestDto authenticationRequest = null;
-            try {
-                authenticationRequest = new ObjectMapper()
-                        .readValue(request.getInputStream(), UsernameAndPasswordAuthenticationRequestDto.class);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            authenticationRequest = new ObjectMapper()
+                    .readValue(request.getInputStream(), UsernameAndPasswordAuthenticationRequestDto.class);
 
-//            Authentication authentication = new UsernamePasswordAuthenticationToken(
-//                    authenticationRequest.getUsername(),
-//                    authenticationRequest.getPassword()
-//            );
+
+//          Authentication authentication = new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(),authenticationRequest.getPassword());
             UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
                     authenticationRequest.getUsername(),
                     authenticationRequest.getPassword()
@@ -61,8 +55,13 @@ public class UserNamePasswordVerifyFilter extends UsernamePasswordAuthentication
 
             authRequest.setDetails(authenticationRequest); // set user object for future usage - optional
 
+
+            /*
+            All the login attempts should be logged , save to data base
+             */
             Authentication authenticate = authenticationManager.authenticate(authRequest);
-            /**
+
+            /*
              * if the user credentials are validated only, below validation will be processed
              */
             customUserDetailsService.validateUserDevice(authenticationRequest);
@@ -85,6 +84,9 @@ public class UserNamePasswordVerifyFilter extends UsernamePasswordAuthentication
             request.setAttribute("errorCode", "AppSignAuthException");
             logger.error(ae.getMessage());
             throw ae;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
         }
     }
 

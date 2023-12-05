@@ -2,6 +2,7 @@ package com.cba.core.wirememobile.dao.impl;
 
 import com.cba.core.wirememobile.dao.CustomUserDetailsDao;
 import com.cba.core.wirememobile.dto.ApplicationUserDto;
+import com.cba.core.wirememobile.dto.ChangePasswordRequestDto;
 import com.cba.core.wirememobile.dto.UsernameAndPasswordAuthenticationRequestDto;
 import com.cba.core.wirememobile.exception.AppSignAuthException;
 import com.cba.core.wirememobile.exception.DeviceAuthException;
@@ -12,12 +13,18 @@ import com.cba.core.wirememobile.repository.DeviceConfigRepository;
 import com.cba.core.wirememobile.repository.DeviceRepository;
 import com.cba.core.wirememobile.repository.UserRepository;
 import com.cba.core.wirememobile.util.DeviceTypeEnum;
+import com.cba.core.wirememobile.util.StatusVarList;
+import com.cba.core.wirememobile.util.UserBeanUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,9 +34,12 @@ import java.util.stream.Collectors;
 public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
 
     private final UserRepository userRepository;
-    //    private final DeviceRepository deviceRepository;
     private final AppSignatureRepository appSignatureRepository;
     private final DeviceConfigRepository deviceConfigRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final ObjectMapper objectMapper;
+    private final UserBeanUtil userBeanUtil;
+
 
     @Override
     public ApplicationUserDto loadUserByUsername(String userName) throws UsernameNotFoundException {
@@ -56,8 +66,6 @@ public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
     @Override
     public boolean validateUserDevice(UsernameAndPasswordAuthenticationRequestDto userDto) throws DeviceAuthException, AppSignAuthException {
 
-//        Device device = deviceRepository.findBySerialNo(userDto.getDeviceSerial())
-//                .orElseThrow(() -> new DeviceAuthException("No device found with given serial"));
         UserType userType = new UserType();
         userType.setId(DeviceTypeEnum.MPOS.getValue());
 
@@ -65,16 +73,24 @@ public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
                 userDto.getDeviceSerial())
                 .orElseThrow(() -> new DeviceAuthException("No device found with given serial"));
 
+
+        /*
+         need to check whether the attempt count has exceeded, if true account should be blocked,
+         there should be an option to reset such accounts
+         */
+
         if (!"MPOS".equalsIgnoreCase(user.getDevice().getDeviceType())) {
             throw new DeviceAuthException("Not a mobile POS device");
-        } else if (!"ACTV".equals(user.getDevice().getStatus().getStatusCode())) {
+        } else if (!StatusVarList.ACTIVE_STATUS_CODE.equals(user.getDevice().getStatus().getStatusCode())) {
             throw new DeviceAuthException("The device is in de-activated state");
         } else if (!userDto.getUuid().equals(user.getDevice().getUniqueId())) {
             throw new DeviceAuthException("UUID has been changed since the initial login , Please contact the bank");
-        } else if (!"ACTV".equals(user.getStatus().getStatusCode())) {
+        } else if (!StatusVarList.ACTIVE_STATUS_CODE.equals(user.getStatus().getStatusCode())) {
             throw new DeviceAuthException("Your account is locked , Please contact the bank to unlock the account");
 
-            // here previously email has been sent, need to check
+            /*
+             here previously email has been sent, need to check
+             */
         }
 
         ApplicationSignature applicationSignature = appSignatureRepository.findByAppVersion(userDto.getAppVersion())
@@ -90,15 +106,58 @@ public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
         DeviceConfig deviceConfig = deviceConfigRepository.findByDevice_Id(user.getDevice().getId()).
                 orElseThrow(() -> new DeviceAuthException("No profile configuration found for this device"));
 
-        if (!"ACTV".equals(deviceConfig.getStatus().getStatusCode())) {
+        if (!StatusVarList.ACTIVE_STATUS_CODE.equals(deviceConfig.getStatus().getStatusCode())) {
             throw new DeviceAuthException("No active profile configuration found for this device");
         }
 
-        if(user.getFirstLogin() == 0){
-            //This is the first time login to the device, should send the email,OTP validation
+        if (user.getFirstLogin() == 0) {
+            /*
+            This is the first time login to the device, should send the email,OTP validation
+            there should be an option to send and verify OTP
+            OTP can be save either in the redis cache or in the Database by hashing
+             */
 
+        } else {
+            /*
+             need to update last login time, login attempt count reset
+             */
         }
         return true;
+    }
+
+    @Override
+    public boolean validateOTP(String otp) throws Exception {
+        return true;
+    }
+
+    /*
+    This is also should be logged as the login attempt
+     */
+    @Override
+    public String changePassword(ChangePasswordRequestDto requestDto) throws Exception {
+        try {
+            Map<String, Object> map = new HashMap<>();
+
+            UserType userType = new UserType();
+            userType.setId(DeviceTypeEnum.MPOS.getValue());
+
+            User entity = userRepository.findByUserNameAndUserType(userBeanUtil.getUsername(), userType).orElseThrow(() -> new NotFoundException("User not found"));
+
+            if (passwordEncoder.matches(requestDto.getCurrentPassword(), entity.getPassword())) {
+                entity.setPassword(passwordEncoder.encode(requestDto.getNewPassword()));
+                userRepository.saveAndFlush(entity);
+            } else {
+                throw new NotFoundException("Fail - Old Password mismatch");
+            }
+
+//            map.put("password", "xxxxxxxx");
+//            String maskValue = objectMapper.writeValueAsString(map);
+
+            return "success";
+
+        } catch (Exception rr) {
+            throw rr;
+        }
     }
 
     private SimpleGrantedAuthority convertToSimpleGrant(UserRole userrole) {

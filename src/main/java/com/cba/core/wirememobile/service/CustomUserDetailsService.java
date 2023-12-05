@@ -1,5 +1,6 @@
 package com.cba.core.wirememobile.service;
 
+import com.cba.core.wirememobile.dto.ChangePasswordRequestDto;
 import com.cba.core.wirememobile.dto.UsernameAndPasswordAuthenticationRequestDto;
 import com.cba.core.wirememobile.exception.AppSignAuthException;
 import com.cba.core.wirememobile.exception.DeviceAuthException;
@@ -12,5 +13,9 @@ public interface CustomUserDetailsService extends UserDetailsService {
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 
     boolean validateUserDevice(UsernameAndPasswordAuthenticationRequestDto userDto) throws DeviceAuthException, AppSignAuthException;
+
+    boolean validateOTP(String otp) throws Exception;
+
+    String changePassword(ChangePasswordRequestDto requestDto) throws Exception;
 
 }

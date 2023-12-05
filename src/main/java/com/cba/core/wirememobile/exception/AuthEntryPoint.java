@@ -27,16 +27,20 @@ public class AuthEntryPoint implements AuthenticationEntryPoint {
                          AuthenticationException authException) throws IOException, ServletException {
         logger.error("Unauthorized error: {}", authException.getMessage());
         String message = "";
-        if (((String) request.getAttribute("errorCode")).equals("BadCredentialsException")) {
+        if (request.getAttribute("errorCode") != null && ((String) request.getAttribute("errorCode")).equals("BadCredentialsException")) {
             message = (((BadCredentialsException) request.getAttribute("errorObject")).getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
-        } else if (((String) request.getAttribute("errorCode")).equals("DeviceAuthException")) {
+        } else if (request.getAttribute("errorCode") != null && ((String) request.getAttribute("errorCode")).equals("DeviceAuthException")) {
             message = (((DeviceAuthException) request.getAttribute("errorObject")).getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
-        } else if (((String) request.getAttribute("errorCode")).equals("AppSignAuthException")) {
+        } else if (request.getAttribute("errorCode") != null && ((String) request.getAttribute("errorCode")).equals("AppSignAuthException")) {
             message = (((AppSignAuthException) request.getAttribute("errorObject")).getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+        } else {
+            message = authException.getMessage();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
         }

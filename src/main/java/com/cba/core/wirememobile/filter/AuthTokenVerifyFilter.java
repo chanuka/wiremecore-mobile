@@ -78,25 +78,25 @@ public class AuthTokenVerifyFilter extends OncePerRequestFilter {
                 throw new JwtTokenException(token, messageSource.getMessage("GLOBAL_TOKEN_BLACK_ERROR", null, currentLocale));
             }
 
-            String[] resourceArray = request.getRequestURI().split("\\/");
-            boolean access = false;
-            String method = request.getMethod();
-            List<PermissionResponseDto> permissionResponseDtoList = permissionService.findAllPermissionsByUser(username);
-
-            access = permissionResponseDtoList.stream()
-                    .filter(permission -> permission.getResourceName().equals(resourceArray[2]))
-                    .anyMatch(permission -> (
-                            (method.equals("GET") && (permission.getReadd() != 0)) ||
-                                    (method.equals("POST") && (permission.getCreated() != 0)) ||
-                                    (method.equals("PUT") && (permission.getUpdated() != 0) ||
-                                            (method.equals("DELETE") && (permission.getDeleted() != 0)))
-                    ));
-
-            if (!access) {
-                logger.debug(messageSource.getMessage("GLOBAL_TOKEN_DENIED_ERROR", null, currentLocale));
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                throw new JwtTokenException(token, messageSource.getMessage("GLOBAL_TOKEN_DENIED_ERROR", null, currentLocale));
-            }
+//            String[] resourceArray = request.getRequestURI().split("\\/");
+//            boolean access = false;
+//            String method = request.getMethod();
+//            List<PermissionResponseDto> permissionResponseDtoList = permissionService.findAllPermissionsByUser(username);
+//
+//            access = permissionResponseDtoList.stream()
+//                    .filter(permission -> permission.getResourceName().equals(resourceArray[2]))
+//                    .anyMatch(permission -> (
+//                            (method.equals("GET") && (permission.getReadd() != 0)) ||
+//                                    (method.equals("POST") && (permission.getCreated() != 0)) ||
+//                                    (method.equals("PUT") && (permission.getUpdated() != 0) ||
+//                                            (method.equals("DELETE") && (permission.getDeleted() != 0)))
+//                    ));
+//
+//            if (!access) {
+//                logger.debug(messageSource.getMessage("GLOBAL_TOKEN_DENIED_ERROR", null, currentLocale));
+//                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+//                throw new JwtTokenException(token, messageSource.getMessage("GLOBAL_TOKEN_DENIED_ERROR", null, currentLocale));
+//            }
 
 
             var authorities = (List<Map<String, String>>) claimsJws.getClaim("authorities");
