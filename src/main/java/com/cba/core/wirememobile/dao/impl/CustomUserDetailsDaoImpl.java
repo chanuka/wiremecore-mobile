@@ -8,21 +8,26 @@ import com.cba.core.wirememobile.exception.AppSignAuthException;
 import com.cba.core.wirememobile.exception.DeviceAuthException;
 import com.cba.core.wirememobile.exception.NotFoundException;
 import com.cba.core.wirememobile.model.*;
-import com.cba.core.wirememobile.repository.AppSignatureRepository;
-import com.cba.core.wirememobile.repository.DeviceConfigRepository;
-import com.cba.core.wirememobile.repository.DeviceRepository;
-import com.cba.core.wirememobile.repository.UserRepository;
+import com.cba.core.wirememobile.repository.*;
+import com.cba.core.wirememobile.service.EmailService;
 import com.cba.core.wirememobile.util.DeviceTypeEnum;
 import com.cba.core.wirememobile.util.StatusVarList;
 import com.cba.core.wirememobile.util.UserBeanUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -36,9 +41,13 @@ public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
     private final UserRepository userRepository;
     private final AppSignatureRepository appSignatureRepository;
     private final DeviceConfigRepository deviceConfigRepository;
+    private final OtpRepository otpRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ObjectMapper objectMapper;
     private final UserBeanUtil userBeanUtil;
+    private final EmailService emailService;
+
+    @Value("${application.otp.expireAfterMinutes}")
+    private int otpExpireAfterMinutes;
 
 
     @Override
@@ -111,6 +120,26 @@ public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
         }
 
         if (user.getFirstLogin() == 0) {
+            OnetimePassword onetimePassword = new OnetimePassword();
+
+            onetimePassword.setUser(user);
+
+            LocalDateTime currentDateTime = LocalDateTime.now();
+            LocalDateTime newDateTime = currentDateTime.plus(otpExpireAfterMinutes, ChronoUnit.MINUTES);
+            Timestamp sqlTimestamp = Timestamp.valueOf(newDateTime);
+            onetimePassword.setExpireson(sqlTimestamp);
+
+            String otp = StringUtils.leftPad(RandomStringUtils.randomNumeric(6), 6, '0');
+            onetimePassword.setValue(passwordEncoder.encode(otp));
+
+            String message = "Your OTP for Wireme is : " + otp;
+            try {
+                emailService.sendEmail(user.getEmail(), message);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+                throw new DeviceAuthException("There is an issue in sending emails");
+            }
+            otpRepository.save(onetimePassword);
             /*
             This is the first time login to the device, should send the email,OTP validation
             there should be an option to send and verify OTP
@@ -127,7 +156,24 @@ public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
 
     @Override
     public boolean validateOTP(String otp) throws Exception {
-        return true;
+
+        UserType userType = new UserType();
+        userType.setId(DeviceTypeEnum.MPOS.getValue());
+
+        User user = userRepository.findByUserNameAndUserType(userBeanUtil.getUsername(), userType)
+                .orElseThrow(() -> new DeviceAuthException("No User Found"));
+
+        OnetimePassword onetimePassword = otpRepository.findByUser(user).orElseThrow(() -> new NotFoundException("No OTP found"));
+        String storedOtp = onetimePassword.getValue();
+
+        if (passwordEncoder.matches(otp, storedOtp) && onetimePassword.getExpireson().compareTo(new Date()) > 0) {
+            user.setFirstLogin(1);
+            userRepository.save(user);
+            otpRepository.deleteById(onetimePassword.getId());
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /*

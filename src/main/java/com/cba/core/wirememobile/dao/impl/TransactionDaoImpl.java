@@ -29,14 +29,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TransactionDaoImpl implements TransactionDao {
 
-    private final TerminalRepository terminalRepository;
-    private final MerchantRepository merchantRepository;
-    private final MerchantCustomerRepository merchantCustomerRepository;
     private final TransactionRepository transactionRepository;
     private final TransactionFailedRepository transactionFailedRepository;
-
-    @Value("${application.resource.transactions}")
-    private String resource;
 
     @PersistenceContext
     private EntityManager entityManager;

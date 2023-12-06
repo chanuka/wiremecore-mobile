@@ -16,7 +16,7 @@ import java.util.Map;
 public interface TransactionResource {
 
 
-    @GetMapping("/summery-device")
+    @GetMapping("/summary-device")
     ResponseEntity<Map<String, ArrayList<Map<String, Object>>>> getAllDeviceTransactionSummary(@RequestParam(defaultValue = "") String dateFrom,
                                                                                          @RequestParam(defaultValue = "") String dateTo,
                                                                                          @RequestParam(defaultValue = "") String queryBy,
