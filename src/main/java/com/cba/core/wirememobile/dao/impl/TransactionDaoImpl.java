@@ -3,15 +3,18 @@ package com.cba.core.wirememobile.dao.impl;
 import com.cba.core.wirememobile.dao.TransactionDao;
 import com.cba.core.wirememobile.dto.*;
 import com.cba.core.wirememobile.exception.NotFoundException;
-import com.cba.core.wirememobile.mapper.*;
-import com.cba.core.wirememobile.model.*;
-import com.cba.core.wirememobile.repository.*;
+import com.cba.core.wirememobile.mapper.TransactionCoreMapper;
+import com.cba.core.wirememobile.mapper.TransactionFailedMapper;
+import com.cba.core.wirememobile.mapper.TransactionMapper;
+import com.cba.core.wirememobile.model.TransactionCore;
+import com.cba.core.wirememobile.model.TransactionCoreFailed;
+import com.cba.core.wirememobile.repository.TransactionFailedRepository;
+import com.cba.core.wirememobile.repository.TransactionRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 @Transactional
