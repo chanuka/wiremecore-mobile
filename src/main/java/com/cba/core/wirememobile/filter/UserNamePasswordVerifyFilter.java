@@ -57,7 +57,7 @@ public class UserNamePasswordVerifyFilter extends UsernamePasswordAuthentication
 
 
             /*
-            All the login attempts should be logged , save to data base
+            All the login attempts should be logged , save to database
              */
             Authentication authenticate = authenticationManager.authenticate(authRequest);
 

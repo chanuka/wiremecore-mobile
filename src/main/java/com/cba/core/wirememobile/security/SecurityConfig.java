@@ -5,10 +5,10 @@ import com.cba.core.wirememobile.exception.AuthEntryPoint;
 import com.cba.core.wirememobile.filter.AuthTokenVerifyFilter;
 import com.cba.core.wirememobile.filter.CustomLogoutHandler;
 import com.cba.core.wirememobile.filter.UserNamePasswordVerifyFilter;
-import com.cba.core.wirememobile.service.impl.CustomUserDetailsServiceImpl;
-import com.cba.core.wirememobile.service.impl.PermissionServiceImpl;
-import com.cba.core.wirememobile.service.impl.RefreshTokenServiceImpl;
-import com.cba.core.wirememobile.service.impl.TokenBlacklistServiceImpl;
+import com.cba.core.wirememobile.service.CustomUserDetailsService;
+import com.cba.core.wirememobile.service.PermissionService;
+import com.cba.core.wirememobile.service.RefreshTokenService;
+import com.cba.core.wirememobile.service.TokenBlacklistService;
 import com.cba.core.wirememobile.util.JwtUtil;
 import com.cba.core.wirememobile.util.UserBeanUtil;
 import lombok.RequiredArgsConstructor;
@@ -40,16 +40,16 @@ import java.util.Arrays;
 @Profile(value = {"dev", "stage"})
 public class SecurityConfig {
 
-    private final CustomUserDetailsServiceImpl customUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final JwtConfig jwtConfig;
-    private final RefreshTokenServiceImpl refreshTokenService;
-    private final PermissionServiceImpl permissionService;// autowired not worked in the context of creating new object using new key word, has to manually inject.
+    private final RefreshTokenService refreshTokenService;
+    private final PermissionService permissionService;// autowired not worked in the context of creating new object using new key word, has to manually inject.
     private final JwtUtil jwtUtil;
     private final JwtEncoder encoder;
     private final JwtDecoder decoder;
     private final UserBeanUtil userBeanUtil;
-    private final TokenBlacklistServiceImpl tokenBlacklistService;
+    private final TokenBlacklistService tokenBlacklistService;
     private final CustomLogoutHandler customLogoutHandler;
     private final MessageSource messageSource;
 

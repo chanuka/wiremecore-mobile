@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-@Transactional // has to add in order to overcome lazy loading issue
+//@Transactional // has to add in order to overcome lazy loading issue and auto transaction mgt
 @RequiredArgsConstructor
 public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
 
@@ -47,18 +47,29 @@ public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
     private final PasswordEncoder passwordEncoder;
     private final UserBeanUtil userBeanUtil;
     private final EmailService emailService;
+//    private final JdbcTemplate jdbcTemplate;
+//    private final TransactionTemplate transactionTemplate;
 
     @Value("${application.otp.expireAfterMinutes}")
     private int otpExpireAfterMinutes;
 
+    @Value("${application.login.maximumInvalidAttemptCount}")
+    private int maximumInvalidAttemptCount;
+
 
     @Override
+    @Transactional
     public ApplicationUserDto loadUserByUsername(String userName) throws UsernameNotFoundException {
         try {
             UserType userType = new UserType();
             userType.setId(DeviceTypeEnum.MPOS.getValue()); // only web users are allowed in this module
 
             User user = userRepository.findByUserNameAndUserType(userName, userType).orElseThrow(() -> new NotFoundException("User not found"));
+
+            if(user.getStatus().getStatusCode().equals("ACTV")) {
+                user.setLoginAttempt(user.getLoginAttempt() + 1);
+                userRepository.save(user);
+            }
 
             Set<SimpleGrantedAuthority> permissions = user.getUserRolesForUserId()
                     .stream()
@@ -74,6 +85,9 @@ public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
 
     }
 
+    /*
+    This method excluded from @transactional for committing updated while sending custom exceptions
+     */
     @Override
     public boolean validateUserDevice(UsernameAndPasswordAuthenticationRequestDto userDto) throws DeviceAuthException, AppSignAuthException {
 
@@ -89,8 +103,12 @@ public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
          need to check whether the attempt count has exceeded, if true account should be blocked,
          there should be an option to reset such accounts
          */
-
-        if (!"MPOS".equalsIgnoreCase(user.getDevice().getDeviceType())) {
+        if (user.getLoginAttempt() > maximumInvalidAttemptCount) {
+//            extracted(userDto.getUsername());
+            user.setStatus(new Status("DACT"));
+            userRepository.saveAndFlush(user);
+            throw new DeviceAuthException("Maximum Invalid login attempt count has been exceeded.");
+        } else if (!"MPOS".equalsIgnoreCase(user.getDevice().getDeviceType())) {
             throw new DeviceAuthException("Not a mobile POS device");
         } else if (!StatusVarList.ACTIVE_STATUS_CODE.equals(user.getDevice().getStatus().getStatusCode())) {
             throw new DeviceAuthException("The device is in de-activated state");
@@ -152,11 +170,32 @@ public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
             /*
              need to update last login time, login attempt count reset
              */
+            user.setLoginAttempt(0);
+            user.setLastLoginTime(new Date());
+            userRepository.save(user);
+
         }
         return true;
     }
 
+//    private void extracted(String userName) {
+//
+//        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
+//            @Override
+//            protected void doInTransactionWithoutResult(TransactionStatus status) {
+//                try {
+//                    String sql = "UPDATE user u SET u.status = ? WHERE u.user_name = ?";
+//                    int rowsAffected = jdbcTemplate.update(sql, "DACT", userName);
+//                } catch (Exception ee) {
+//                    status.setRollbackOnly();
+//                }
+//            }
+//        });
+//
+//    }
+
     @Override
+    @Transactional
     public boolean validateOTP(String otp) throws Exception {
 
         UserType userType = new UserType();
@@ -182,6 +221,7 @@ public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
     This is also should be logged as the login attempt
      */
     @Override
+    @Transactional
     public String changePassword(ChangePasswordRequestDto requestDto) throws Exception {
         try {
             Map<String, Object> map = new HashMap<>();

@@ -47,21 +47,14 @@ application:
   refresh:
     tokenExpirationAfterMillis: 120000
   resource:
-    devices: devices
     deviceconfig: deviceconfig
-    device_model: devicemodel
-    device_vendor: devicevendor
     users: users
-    roles: roles
-    terminals: terminals
-    partners: partners
-    merchants: merchants
-    resources: resources
-    userroles: userroles
     permissions: permissions
     transactions: transactions
   otp:
     expireAfterMinutes: 5
+  login:
+    maximumInvalidAttemptCount: 5
 
 rsa:
   private-key: classpath:certs/private.pem
@@ -78,7 +71,7 @@ springdoc:
 
 swagger:
   server:
-    url: http://localhost:8091/wireme-coreweb
+    url: http://localhost:8092/wireme-coremobile
 
 # this is to activate spring actuator
 management:
@@ -89,4 +82,4 @@ management:
     enabled-by-default: true
 
 logging:
-  config: C:\conf\wiremecoreweb\logback-spring.xml
+  config: C:\conf\wiremecoremobile\logback-spring.xml

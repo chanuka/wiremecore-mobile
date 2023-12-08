@@ -25,7 +25,7 @@ public class User implements java.io.Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, nullable = false)
     private Integer id;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "device_id")
     private Device device;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -34,7 +34,7 @@ public class User implements java.io.Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "merchant_customer_id")
     private MerchantCustomer merchantCustomer;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "status", nullable = false)
     private Status status;
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,10 +1,8 @@
 package com.cba.core.wirememobile.service.impl;
 
 import com.cba.core.wirememobile.dao.PermissionDao;
-import com.cba.core.wirememobile.dto.PermissionRequestDto;
 import com.cba.core.wirememobile.dto.PermissionResponseDto;
 import com.cba.core.wirememobile.service.PermissionService;
-import com.cba.core.wirememobile.util.UserBeanUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -15,10 +13,9 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class PermissionServiceImpl implements PermissionService<PermissionResponseDto, PermissionRequestDto> {
+public class PermissionServiceImpl implements PermissionService {
 
-    private final PermissionDao<PermissionResponseDto, PermissionRequestDto> dao;
-    private final UserBeanUtil userBeanUtil;
+    private final PermissionDao dao;
 
     @Override
     public Page<PermissionResponseDto> findAll(int page, int pageSize) throws Exception {
@@ -40,40 +37,6 @@ public class PermissionServiceImpl implements PermissionService<PermissionRespon
         return dao.findById(id);
     }
 
-    @Override
-    public PermissionResponseDto deleteById(int id) throws Exception {
-        return dao.deleteById(id);
-    }
-
-    @Override
-    public void deleteByIdList(List<Integer> idList) throws Exception {
-        dao.deleteByIdList(idList);
-    }
-
-    @Override
-    public PermissionResponseDto updateById(int id, PermissionRequestDto requestDto) throws Exception {
-        return dao.updateById(id, requestDto);
-    }
-
-    @Override
-    public PermissionResponseDto create(PermissionRequestDto requestDto) throws Exception {
-        return dao.create(requestDto);
-    }
-
-    @Override
-    public List<PermissionResponseDto> createBulk(List<PermissionRequestDto> requestDtoList) throws Exception {
-        return dao.createBulk(requestDtoList);
-    }
-
-    @Override
-    public byte[] exportPdfReport() throws Exception {
-        return new byte[0];
-    }
-
-    @Override
-    public byte[] exportExcelReport() throws Exception {
-        return new byte[0];
-    }
 
     @Override
     public List<PermissionResponseDto> findAllPermissionsByUser(String username) throws SQLException {

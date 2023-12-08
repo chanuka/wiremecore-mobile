@@ -1,8 +1,6 @@
 package com.cba.core.wirememobile.filter;
 
 import com.cba.core.wirememobile.config.JwtConfig;
-import com.cba.core.wirememobile.dto.PermissionRequestDto;
-import com.cba.core.wirememobile.dto.PermissionResponseDto;
 import com.cba.core.wirememobile.exception.JwtTokenException;
 import com.cba.core.wirememobile.service.PermissionService;
 import com.cba.core.wirememobile.service.TokenBlacklistService;
@@ -36,7 +34,7 @@ public class AuthTokenVerifyFilter extends OncePerRequestFilter {
 
     private final JwtConfig jwtConfig;
     private final JwtUtil jwtUtil;
-    private final PermissionService<PermissionResponseDto, PermissionRequestDto> permissionService;
+    private final PermissionService permissionService;
     private final JwtDecoder decoder;
     private final UserBeanUtil userBeanUtil;
     private final TokenBlacklistService tokenBlacklistService;
