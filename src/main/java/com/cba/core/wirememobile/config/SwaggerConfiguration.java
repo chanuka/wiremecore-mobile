@@ -27,9 +27,9 @@ public class SwaggerConfiguration {
                                 .scheme("bearer")
                                 .bearerFormat("JWT")))
                 .info(new Info()
-                        .title("WireMe Core Web System")
+                        .title("WireMe Core Mobile System")
                         .version("1.0.0")
-                        .description("WireMe Core Web System")
-                        .contact(new Contact().name("WireMe Core Web System")));
+                        .description("WireMe Core Mobile System")
+                        .contact(new Contact().name("WireMe Core Mobile System")));
     }
 }
