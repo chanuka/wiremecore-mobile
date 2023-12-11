@@ -11,6 +11,7 @@ import com.cba.core.wirememobile.service.RefreshTokenService;
 import com.cba.core.wirememobile.service.TokenBlacklistService;
 import com.cba.core.wirememobile.util.JwtUtil;
 import com.cba.core.wirememobile.util.UserBeanUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -52,6 +53,7 @@ public class SecurityConfig {
     private final TokenBlacklistService tokenBlacklistService;
     private final CustomLogoutHandler customLogoutHandler;
     private final MessageSource messageSource;
+    private final ObjectMapper objectMapper;
 
 
     @Bean
@@ -108,7 +110,7 @@ public class SecurityConfig {
 //        http.authenticationProvider(authenticationProvider()); // no need, auto detect
 
         http.addFilter(new UserNamePasswordVerifyFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)),
-                jwtConfig, refreshTokenService, customUserDetailsService, jwtUtil, encoder));
+                jwtConfig, refreshTokenService, customUserDetailsService, jwtUtil, encoder,objectMapper));
         http.addFilterAfter(new AuthTokenVerifyFilter(jwtConfig, jwtUtil, permissionService, decoder, userBeanUtil, tokenBlacklistService, messageSource), UserNamePasswordVerifyFilter.class);
 
         return http.build();

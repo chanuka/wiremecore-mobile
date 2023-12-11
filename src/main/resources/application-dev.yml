@@ -42,7 +42,7 @@ spring:
 application:
   jwt:
     secretKey: securesecuresecuresecuresecuresecuresecuresecuresecuresecuresecure
-    tokenPrefix: Bearer
+#    tokenPrefix: Bearer
     tokenExpirationAfterMillis: 604800000       #86400000,3600000,60,000  Token is issued for a week, has to change once go live
   refresh:
     tokenExpirationAfterMillis: 120000

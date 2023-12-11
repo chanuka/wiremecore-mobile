@@ -1,9 +1,7 @@
 package com.cba.core.wirememobile.dao.impl;
 
 import com.cba.core.wirememobile.dao.CustomUserDetailsDao;
-import com.cba.core.wirememobile.dto.ApplicationUserDto;
-import com.cba.core.wirememobile.dto.ChangePasswordRequestDto;
-import com.cba.core.wirememobile.dto.UsernameAndPasswordAuthenticationRequestDto;
+import com.cba.core.wirememobile.dto.*;
 import com.cba.core.wirememobile.exception.AppSignAuthException;
 import com.cba.core.wirememobile.exception.DeviceAuthException;
 import com.cba.core.wirememobile.exception.NotFoundException;
@@ -16,6 +14,8 @@ import com.cba.core.wirememobile.service.EmailService;
 import com.cba.core.wirememobile.util.DeviceTypeEnum;
 import com.cba.core.wirememobile.util.StatusVarList;
 import com.cba.core.wirememobile.util.UserBeanUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -47,6 +47,7 @@ public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
     private final PasswordEncoder passwordEncoder;
     private final UserBeanUtil userBeanUtil;
     private final EmailService emailService;
+    private final ObjectMapper objectMapper;
 //    private final JdbcTemplate jdbcTemplate;
 //    private final TransactionTemplate transactionTemplate;
 
@@ -66,7 +67,7 @@ public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
 
             User user = userRepository.findByUserNameAndUserType(userName, userType).orElseThrow(() -> new NotFoundException("User not found"));
 
-            if(user.getStatus().getStatusCode().equals("ACTV")) {
+            if (user.getStatus().getStatusCode().equals("ACTV")) {
                 user.setLoginAttempt(user.getLoginAttempt() + 1);
                 userRepository.save(user);
             }
@@ -89,8 +90,9 @@ public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
     This method excluded from @transactional for committing updated while sending custom exceptions
      */
     @Override
-    public boolean validateUserDevice(UsernameAndPasswordAuthenticationRequestDto userDto) throws DeviceAuthException, AppSignAuthException {
+    public SuccessAuthResponse validateUserDevice(UsernameAndPasswordAuthenticationRequestDto userDto) throws DeviceAuthException, AppSignAuthException {
 
+        SuccessAuthResponse successAuthResponse = new SuccessAuthResponse();
         UserType userType = new UserType();
         userType.setId(DeviceTypeEnum.MPOS.getValue());
 
@@ -139,7 +141,18 @@ public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
             throw new DeviceAuthException("No active profile configuration found for this device");
         }
 
+        DeviceConfigResponseDto responseDto = null;
+        try {
+            responseDto = objectMapper.readValue(deviceConfig.getConfig(), DeviceConfigResponseDto.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        successAuthResponse.setProfileData(responseDto);
+
         if (user.getFirstLogin() == 0) {
+            successAuthResponse.setInitialLogin(true);
+            successAuthResponse.setOtpRequired(true);
+            successAuthResponse.setOtpLifeTime(otpExpireAfterMinutes);
             OnetimePassword onetimePassword = new OnetimePassword();
 
             onetimePassword.setUser(user);
@@ -157,6 +170,10 @@ public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
                 emailService.sendEmail(user.getEmail(), message);
             } catch (Exception exception) {
                 exception.printStackTrace();
+                if (user.getStatus().getStatusCode().equals("ACTV")) {
+                    user.setLoginAttempt(user.getLoginAttempt() - 1);
+                    userRepository.save(user);
+                }
                 throw new DeviceAuthException("There is an issue in sending emails");
             }
             otpRepository.save(onetimePassword);
@@ -170,12 +187,13 @@ public class CustomUserDetailsDaoImpl implements CustomUserDetailsDao {
             /*
              need to update last login time, login attempt count reset
              */
+            successAuthResponse.setInitialLogin(false);
             user.setLoginAttempt(0);
             user.setLastLoginTime(new Date());
             userRepository.save(user);
 
         }
-        return true;
+        return successAuthResponse;
     }
 
 //    private void extracted(String userName) {

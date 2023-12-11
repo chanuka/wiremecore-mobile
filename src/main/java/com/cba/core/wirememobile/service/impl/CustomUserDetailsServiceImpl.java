@@ -3,6 +3,7 @@ package com.cba.core.wirememobile.service.impl;
 import com.cba.core.wirememobile.dao.CustomUserDetailsDao;
 import com.cba.core.wirememobile.dto.ApplicationUserDto;
 import com.cba.core.wirememobile.dto.ChangePasswordRequestDto;
+import com.cba.core.wirememobile.dto.SuccessAuthResponse;
 import com.cba.core.wirememobile.dto.UsernameAndPasswordAuthenticationRequestDto;
 import com.cba.core.wirememobile.exception.AppSignAuthException;
 import com.cba.core.wirememobile.exception.DeviceAuthException;
@@ -30,7 +31,7 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
     }
 
     @Override
-    public boolean validateUserDevice(UsernameAndPasswordAuthenticationRequestDto userDto) throws DeviceAuthException, AppSignAuthException {
+    public SuccessAuthResponse validateUserDevice(UsernameAndPasswordAuthenticationRequestDto userDto) throws DeviceAuthException, AppSignAuthException {
         return customUserDetailsDao.validateUserDevice(userDto);
     }
 
