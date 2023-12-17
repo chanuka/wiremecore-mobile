@@ -100,6 +100,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> {
                     authorize.requestMatchers("/").permitAll();
                     authorize.requestMatchers("/refreshtoken").permitAll();
+                    authorize.requestMatchers("/general/**").permitAll();
                     authorize.requestMatchers("/transactions/**").permitAll();
                     authorize.requestMatchers("/swagger-doc/**").permitAll();
                     authorize.requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll();
@@ -110,7 +111,7 @@ public class SecurityConfig {
 //        http.authenticationProvider(authenticationProvider()); // no need, auto detect
 
         http.addFilter(new UserNamePasswordVerifyFilter(authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)),
-                jwtConfig, refreshTokenService, customUserDetailsService, jwtUtil, encoder,objectMapper));
+                jwtConfig, refreshTokenService, customUserDetailsService, jwtUtil, encoder, objectMapper));
         http.addFilterAfter(new AuthTokenVerifyFilter(jwtConfig, jwtUtil, permissionService, decoder, userBeanUtil, tokenBlacklistService, messageSource), UserNamePasswordVerifyFilter.class);
 
         return http.build();
