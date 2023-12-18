@@ -6,10 +6,10 @@ import com.cba.core.wirememobile.exception.NotFoundException;
 import com.cba.core.wirememobile.mapper.TransactionCoreMapper;
 import com.cba.core.wirememobile.mapper.TransactionFailedMapper;
 import com.cba.core.wirememobile.mapper.TransactionMapper;
-import com.cba.core.wirememobile.model.TransactionCore;
-import com.cba.core.wirememobile.model.TransactionCoreFailed;
-import com.cba.core.wirememobile.repository.TransactionFailedRepository;
-import com.cba.core.wirememobile.repository.TransactionRepository;
+import com.cba.core.wirememobile.model.*;
+import com.cba.core.wirememobile.repository.*;
+import com.cba.core.wirememobile.util.DeviceTypeEnum;
+import com.cba.core.wirememobile.util.SettlementMethodEnum;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -33,9 +33,52 @@ public class TransactionDaoImpl implements TransactionDao {
 
     private final TransactionRepository transactionRepository;
     private final TransactionFailedRepository transactionFailedRepository;
+    private final DeviceRepository deviceRepository;
+    private final MerchantRepository merchantRepository;
+    private final TerminalRepository terminalRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Override
+    public void settlement(SettlementRequestDto requestDto) throws Exception {
+
+        if (requestDto.getSettleAcquirers() == null || requestDto.getSettleAcquirers().isEmpty()) {
+            throw new NotFoundException("No Terminals for settle");
+        }
+        Device device = deviceRepository.findBySerialNo(requestDto.getDeviceSerialNo()).orElseThrow(() -> new NotFoundException("Device Not Found"));
+
+        if (!"ACTV".equals(device.getStatus().getStatusCode())) {
+            throw new NotFoundException("Device is not Active");
+        }
+
+        if(device.getDeviceType().equals(DeviceTypeEnum.MPOS)){
+            /*
+             do MPOS related validation
+             need to find a way to trigger the device type
+             */
+
+        }
+        requestDto.getSettleAcquirers().stream().forEach((settleObj) -> {
+
+            Merchant merchant = merchantRepository.findByMerchantId(settleObj.getMerchantId()).orElseThrow(() -> new NotFoundException("Merchant Not Found"));
+            if (!"ACTV".equals(merchant.getStatus().getStatusCode())) {
+                throw new NotFoundException("Merchant is not Active");
+            }
+            Terminal terminal = terminalRepository.findByTerminalId(settleObj.getTerminalId()).orElseThrow(() -> new NotFoundException("Terminal Not Found"));
+            if (!"ACTV".equals(terminal.getStatus().getStatusCode())) {
+                throw new NotFoundException("Terminal is not Active");
+            }
+
+            if (settleObj.getSettledMethod() != SettlementMethodEnum.AUTO.getValue() &&
+                    settleObj.getSettledMethod() != SettlementMethodEnum.MANUAL.getValue()) {
+                throw new NotFoundException("Invalid Settlement Method");
+            }
+            transactionRepository.updateRecordsWithCondition(true, settleObj.getSettledMethod(), requestDto.getOriginId(),
+                    settleObj.getMerchantId(), settleObj.getTerminalId(), settleObj.getBatchNo());
+        });
+
+    }
 
     @Override
     public TransactionResponseDto create(TransactionRequestDto requestDto) throws Exception {

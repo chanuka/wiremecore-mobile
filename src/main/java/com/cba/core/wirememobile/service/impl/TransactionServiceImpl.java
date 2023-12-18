@@ -1,6 +1,7 @@
 package com.cba.core.wirememobile.service.impl;
 
 import com.cba.core.wirememobile.dao.TransactionDao;
+import com.cba.core.wirememobile.dto.SettlementRequestDto;
 import com.cba.core.wirememobile.dto.TransactionCoreResponseDto;
 import com.cba.core.wirememobile.dto.TransactionRequestDto;
 import com.cba.core.wirememobile.dto.TransactionResponseDto;
@@ -18,6 +19,11 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionDao transactionDao;
 
+
+    @Override
+    public void settlement(SettlementRequestDto requestDto) throws Exception {
+        transactionDao.settlement(requestDto);
+    }
 
     @Override
     public TransactionResponseDto create(TransactionRequestDto requestDto) throws Exception {

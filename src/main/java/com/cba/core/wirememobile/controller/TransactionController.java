@@ -66,17 +66,12 @@ public class TransactionController implements TransactionResource {
     }
 
     @Override
-    public ResponseEntity<SettlementResponseDto> settleTransaction(SettlementRequestDto requestDto) throws Exception {
+    public ResponseEntity<String> settleTransaction(SettlementRequestDto requestDto) throws Exception {
         Locale currentLocale = LocaleContextHolder.getLocale();
         logger.debug(messageSource.getMessage("TRANSACTION_SETTLE_ONE_DEBUG", null, currentLocale));
         try {
-//            List<MerchantResponseDto> responseDtoList = transactionService.getAllMerchants();
-            SettlementResponseDto n = new SettlementResponseDto();
-            n.setOriginId(requestDto.getOriginId());
-            n.setDeviceSerialNo(requestDto.getDeviceSerialNo());
-            n.setSettlementAcquires(requestDto.getSettleAcquirers());
-            
-            return ResponseEntity.ok().body(n);
+            transactionService.settlement(requestDto);
+            return ResponseEntity.ok().body("Settlement Success");
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw e;
@@ -108,7 +103,6 @@ public class TransactionController implements TransactionResource {
             throw e;
         }
     }
-
 
 
     @Override

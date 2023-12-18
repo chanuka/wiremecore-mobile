@@ -17,22 +17,22 @@ public interface TransactionResource {
 
     @GetMapping("/summary-device")
     ResponseEntity<Map<String, ArrayList<Map<String, Object>>>> getAllDeviceTransactionSummary(@RequestParam(defaultValue = "") String dateFrom,
-                                                                                         @RequestParam(defaultValue = "") String dateTo,
-                                                                                         @RequestParam(defaultValue = "") String queryBy,
-                                                                                         @RequestParam(defaultValue = "") String originId,
-                                                                                         @RequestParam(defaultValue = "") String deviceSerial) throws Exception;
+                                                                                               @RequestParam(defaultValue = "") String dateTo,
+                                                                                               @RequestParam(defaultValue = "") String queryBy,
+                                                                                               @RequestParam(defaultValue = "") String originId,
+                                                                                               @RequestParam(defaultValue = "") String deviceSerial) throws Exception;
 
     @GetMapping("/detailed-device")
     ResponseEntity<PaginationResponse<TransactionCoreResponseDto>> getAllDeviceTransactions(@RequestParam(defaultValue = "") String dateFrom,
-                                                                                      @RequestParam(defaultValue = "") String dateTo,
-                                                                                      @RequestParam(defaultValue = "") String originId,
-                                                                                      @RequestParam(defaultValue = "") String deviceSerial,
-                                                                                      @RequestParam(defaultValue = "") int isSettled,
-                                                                                             @RequestParam(defaultValue = "0") int page,
-                                                                                             @RequestParam(defaultValue = "5") int pageSize) throws Exception;
+                                                                                            @RequestParam(defaultValue = "") String dateTo,
+                                                                                            @RequestParam(defaultValue = "") String originId,
+                                                                                            @RequestParam(defaultValue = "") String deviceSerial,
+                                                                                            @RequestParam(defaultValue = "") int isSettled,
+                                                                                            @RequestParam(defaultValue = "0") int page,
+                                                                                            @RequestParam(defaultValue = "5") int pageSize) throws Exception;
 
     @PutMapping("/settle-state")
-    ResponseEntity<SettlementResponseDto> settleTransaction(@Valid @RequestBody SettlementRequestDto requestDto) throws Exception;
+    ResponseEntity<String> settleTransaction(@Valid @RequestBody SettlementRequestDto requestDto) throws Exception;
 
     @PostMapping("/failed")
     ResponseEntity<TransactionResponseDto> createFailedTransaction(@Valid @RequestBody TransactionRequestDto requestDto) throws Exception;

@@ -8,6 +8,8 @@ import java.util.Map;
 
 public interface TransactionDao {
 
+    void settlement(SettlementRequestDto requestDto) throws Exception;
+
     TransactionResponseDto create(TransactionRequestDto requestDto) throws Exception;
 
     TransactionResponseDto createFailed(TransactionRequestDto requestDto) throws Exception;
