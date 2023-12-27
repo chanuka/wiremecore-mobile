@@ -31,6 +31,31 @@ public class TransactionController implements TransactionResource {
     private final MessageSource messageSource;
 
     @Override
+    public ResponseEntity<String> generateEReceipt(EReceiptRequestDto requestDto) throws Exception {
+        Locale currentLocale = LocaleContextHolder.getLocale();
+        logger.debug(messageSource.getMessage("TRANSACTION_POST_E-RECEIPT_DEBUG", null, currentLocale));
+        try {
+            String response = transactionService.generateEReceipt(requestDto);
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw e;
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> generateEReceipt(int id) throws Exception {
+        Locale currentLocale = LocaleContextHolder.getLocale();
+        logger.debug(messageSource.getMessage("TRANSACTION_POST_E-RECEIPT_DEBUG", null, currentLocale));
+        try {
+            String response = transactionService.generateEReceipt(id);
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw e;
+        }    }
+
+    @Override
     public ResponseEntity<Map<String, ArrayList<Map<String, Object>>>> getAllDeviceTransactionSummary(String dateFrom,
                                                                                                       String dateTo,
                                                                                                       String queryBy,

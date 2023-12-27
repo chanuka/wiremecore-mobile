@@ -1,9 +1,6 @@
 package com.cba.core.wirememobile.service;
 
-import com.cba.core.wirememobile.dto.SettlementRequestDto;
-import com.cba.core.wirememobile.dto.TransactionCoreResponseDto;
-import com.cba.core.wirememobile.dto.TransactionRequestDto;
-import com.cba.core.wirememobile.dto.TransactionResponseDto;
+import com.cba.core.wirememobile.dto.*;
 import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
@@ -12,6 +9,10 @@ import java.util.Map;
 public interface TransactionService {
 
     void settlement(SettlementRequestDto requestDto) throws Exception;
+
+    String generateEReceipt(EReceiptRequestDto requestDto) throws Exception;
+
+    String generateEReceipt(int id) throws Exception;
 
     TransactionResponseDto create(TransactionRequestDto requestDto) throws Exception;
 

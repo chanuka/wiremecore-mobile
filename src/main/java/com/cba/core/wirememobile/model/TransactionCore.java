@@ -49,7 +49,7 @@ public class TransactionCore implements java.io.Serializable {
     private Integer invoiceNo;
 
     @Column(name = "amount", nullable = false)
-    private int amount;
+    private Integer amount;
 
     @Column(name = "currency", nullable = false, length = 6)
     private String currency;
@@ -112,6 +112,9 @@ public class TransactionCore implements java.io.Serializable {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "transactionCore")
     private Set<SettlementInfo> settlementInfos = new HashSet<SettlementInfo>(0);
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "transactionCore")
+    private Set<EReceipt> eReceipts = new HashSet<EReceipt>(0);
 
 }
 

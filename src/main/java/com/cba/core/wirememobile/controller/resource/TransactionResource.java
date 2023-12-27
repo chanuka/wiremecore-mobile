@@ -15,6 +15,13 @@ import java.util.Map;
 public interface TransactionResource {
 
 
+    @PostMapping("/e-receipt")
+    ResponseEntity<String> generateEReceipt(@Valid @RequestBody EReceiptRequestDto requestDto) throws Exception;
+
+    @PostMapping("/e-receipt/{id}")
+    ResponseEntity<String> generateEReceipt(@PathVariable(value = "id") int id) throws Exception;
+
+
     @GetMapping("/summary-device")
     ResponseEntity<Map<String, ArrayList<Map<String, Object>>>> getAllDeviceTransactionSummary(@RequestParam(defaultValue = "") String dateFrom,
                                                                                                @RequestParam(defaultValue = "") String dateTo,

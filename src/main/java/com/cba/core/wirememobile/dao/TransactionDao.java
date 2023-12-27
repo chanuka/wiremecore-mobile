@@ -8,6 +8,10 @@ import java.util.Map;
 
 public interface TransactionDao {
 
+    String generateEReceipt(EReceiptRequestDto requestDto) throws Exception;
+
+    String generateEReceipt(int id) throws Exception;
+
     void settlement(SettlementRequestDto requestDto) throws Exception;
 
     TransactionResponseDto create(TransactionRequestDto requestDto) throws Exception;

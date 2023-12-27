@@ -1,10 +1,7 @@
 package com.cba.core.wirememobile.service.impl;
 
 import com.cba.core.wirememobile.dao.TransactionDao;
-import com.cba.core.wirememobile.dto.SettlementRequestDto;
-import com.cba.core.wirememobile.dto.TransactionCoreResponseDto;
-import com.cba.core.wirememobile.dto.TransactionRequestDto;
-import com.cba.core.wirememobile.dto.TransactionResponseDto;
+import com.cba.core.wirememobile.dto.*;
 import com.cba.core.wirememobile.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +20,16 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public void settlement(SettlementRequestDto requestDto) throws Exception {
         transactionDao.settlement(requestDto);
+    }
+
+    @Override
+    public String generateEReceipt(EReceiptRequestDto requestDto) throws Exception {
+        return transactionDao.generateEReceipt(requestDto);
+    }
+
+    @Override
+    public String generateEReceipt(int id) throws Exception {
+        return transactionDao.generateEReceipt(id);
     }
 
     @Override

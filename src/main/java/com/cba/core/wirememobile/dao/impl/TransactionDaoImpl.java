@@ -8,6 +8,8 @@ import com.cba.core.wirememobile.mapper.TransactionFailedMapper;
 import com.cba.core.wirememobile.mapper.TransactionMapper;
 import com.cba.core.wirememobile.model.*;
 import com.cba.core.wirememobile.repository.*;
+import com.cba.core.wirememobile.service.EmailService;
+import com.cba.core.wirememobile.service.SmsService;
 import com.cba.core.wirememobile.util.DeviceTypeEnum;
 import com.cba.core.wirememobile.util.SettlementMethodEnum;
 import jakarta.persistence.EntityManager;
@@ -15,6 +17,8 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,9 +40,97 @@ public class TransactionDaoImpl implements TransactionDao {
     private final DeviceRepository deviceRepository;
     private final MerchantRepository merchantRepository;
     private final TerminalRepository terminalRepository;
+    private final EReceiptRepository eReceiptRepository;
+    private final EmailService emailService;
+    private final SmsService smsService;
+
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Override
+    public String generateEReceipt(EReceiptRequestDto requestDto) throws Exception {
+
+//        transactionRepository.findById(id).orElseThrow(() -> new NotFoundException("Transaction Not Found"));
+        return null;
+    }
+
+    @Override
+    public String generateEReceipt(int id) throws Exception {
+
+        TransactionCore transactionCore = transactionRepository.findById(id).orElseThrow(() -> new NotFoundException("Transaction Not Found"));
+
+        EReceipt eReceipt = eReceiptRepository.findByTransactionCore_Id(id).orElseThrow(() -> new NotFoundException("e-Receipt Info Not Found"));
+
+        Terminal terminal = terminalRepository.findByTerminalId(transactionCore.getTerminalId()).orElseThrow(() -> new NotFoundException("Terminal Not Found"));
+
+        Merchant merchant = merchantRepository.findByMerchantId(transactionCore.getMerchantId()).orElseThrow(() -> new NotFoundException("Merchant Not Found"));
+
+        if (merchant.getIsEmailEnabled()) {
+
+            EReceiptDataDto eReceiptMerchant = new EReceiptDataDto(
+                    transactionCore.getMerchantId(),
+                    transactionCore.getTerminalId(),
+                    transactionCore.getTranType(),
+                    transactionCore.getPaymentMode(),
+                    transactionCore.getCardLabel(),
+                    transactionCore.getInvoiceNo(),
+                    transactionCore.getAuthCode(),
+                    transactionCore.getCurrency(),
+                    transactionCore.getAmount(),
+                    transactionCore.getPan(),
+                    merchant.getEmail(),
+                    merchant.getContactNo(),
+                    transactionCore.getDateTime(),
+                    transactionCore.getSignData()
+            );
+            emailService.sendEmail(eReceiptMerchant.getEmail(), eReceiptMerchant);
+        }
+        if (merchant.getIsSmsEnabled()) {
+            EReceiptDataDto eReceiptMerchant = new EReceiptDataDto(
+                    transactionCore.getMerchantId(),
+                    transactionCore.getTerminalId(),
+                    transactionCore.getTranType(),
+                    transactionCore.getPaymentMode(),
+                    transactionCore.getCardLabel(),
+                    transactionCore.getInvoiceNo(),
+                    transactionCore.getAuthCode(),
+                    transactionCore.getCurrency(),
+                    transactionCore.getAmount(),
+                    transactionCore.getPan(),
+                    merchant.getEmail(),
+                    merchant.getContactNo(),
+                    transactionCore.getDateTime(),
+                    transactionCore.getSignData()
+            );
+            smsService.sendSms(eReceiptMerchant.getContactNo(), eReceiptMerchant);
+        }
+
+
+        EReceiptDataDto eReceiptCustomer = new EReceiptDataDto(
+                transactionCore.getMerchantId(),
+                transactionCore.getTerminalId(),
+                transactionCore.getTranType(),
+                transactionCore.getPaymentMode(),
+                transactionCore.getCardLabel(),
+                transactionCore.getInvoiceNo(),
+                transactionCore.getAuthCode(),
+                transactionCore.getCurrency(),
+                transactionCore.getAmount(),
+                transactionCore.getPan(),
+                eReceipt.getEmail(),
+                eReceipt.getContactNo(),
+                transactionCore.getDateTime(),
+                transactionCore.getSignData()
+        );
+
+        emailService.sendEmail(eReceiptCustomer.getEmail(), eReceiptCustomer);
+        smsService.sendSms(eReceiptCustomer.getContactNo(), eReceiptCustomer);
+
+//        Device device = deviceRepository.findById(terminal.getDevice().getId()).orElseThrow(() -> new NotFoundException("Device Not Found"));
+
+        return "e-Receipt Sent Successfully";
+    }
 
     @Override
     public void settlement(SettlementRequestDto requestDto) throws Exception {
@@ -52,7 +144,7 @@ public class TransactionDaoImpl implements TransactionDao {
             throw new NotFoundException("Device is not Active");
         }
 
-        if(device.getDeviceType().equals(DeviceTypeEnum.MPOS)){
+        if (device.getDeviceType().equals(DeviceTypeEnum.MPOS)) {
             /*
              do MPOS related validation
              need to find a way to trigger the device type
