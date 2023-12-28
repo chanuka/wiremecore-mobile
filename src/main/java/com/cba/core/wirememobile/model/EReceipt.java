@@ -41,4 +41,12 @@ public class EReceipt implements java.io.Serializable {
     @LastModifiedDate
     private Date updatedAt;
 
+    public EReceipt(TransactionCore transactionCore, String email, String contactNo, String receiptType, Boolean is_sent_mail, Boolean isSentSms) {
+        this.transactionCore = transactionCore;
+        this.email = email;
+        this.contactNo = contactNo;
+        this.receiptType = receiptType;
+        this.is_sent_mail = is_sent_mail;
+        this.isSentSms = isSentSms;
+    }
 }

@@ -2,9 +2,13 @@ package com.cba.core.wirememobile.service.impl;
 
 import com.cba.core.wirememobile.dto.EReceiptDataDto;
 import com.cba.core.wirememobile.dto.EmailRequestDto;
+import com.cba.core.wirememobile.exception.NotFoundException;
+import com.cba.core.wirememobile.model.EReceipt;
+import com.cba.core.wirememobile.repository.EReceiptRepository;
 import com.cba.core.wirememobile.service.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
@@ -21,10 +25,13 @@ import java.nio.charset.StandardCharsets;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender javaMailSender;
     private final SpringTemplateEngine templateEngine;
+    private final EReceiptRepository eReceiptRepository;
+
 //    @Qualifier("asyncExecutor")
 //    private final TaskExecutor taskExecutor;
 
@@ -91,6 +98,10 @@ public class EmailServiceImpl implements EmailService {
 //        helper.setFrom(emailRequestDto.getFrom());
 
         javaMailSender.send(message);
+
+        EReceipt eReceipt = eReceiptRepository.findById(data.getId()).orElseThrow(() -> new NotFoundException("e-Receipt Info Not Found"));
+        eReceipt.setIs_sent_mail(true);
+        eReceiptRepository.save(eReceipt);
         System.out.println("Copy of e-Receipt mail has been sent successfully.!!!");
     }
 }

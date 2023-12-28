@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface EReceiptRepository extends JpaRepository<EReceipt, Integer>, JpaSpecificationExecutor<EReceipt> {
 
     Optional<EReceipt> findByTransactionCore_Id(Integer integer);
+
+    Optional<EReceipt> findByTransactionCore_IdAndReceiptType(Integer integer, String receiptType);
 }

@@ -51,8 +51,51 @@ public class TransactionDaoImpl implements TransactionDao {
     @Override
     public String generateEReceipt(EReceiptRequestDto requestDto) throws Exception {
 
-//        transactionRepository.findById(id).orElseThrow(() -> new NotFoundException("Transaction Not Found"));
-        return null;
+        TransactionCore transactionCore = transactionRepository.findByRrnAndInvoiceNoAndTraceNo(
+                requestDto.getSerialNo(),
+                requestDto.getRrn(),
+                requestDto.getInvoiceNo(),
+                requestDto.getTraceNo()
+        ).orElseThrow(() -> new NotFoundException("Transaction Not Found"));
+
+        EReceipt eReceipt = eReceiptRepository.findByTransactionCore_IdAndReceiptType(transactionCore.getId(), "customer_copy").orElseThrow(() -> new NotFoundException("e-Receipt Info Not Found"));
+        Terminal terminal = terminalRepository.findByTerminalId(transactionCore.getTerminalId()).orElseThrow(() -> new NotFoundException("Terminal Not Found"));
+        Merchant merchant = merchantRepository.findByMerchantId(transactionCore.getMerchantId()).orElseThrow(() -> new NotFoundException("Merchant Not Found"));
+
+        if (eReceipt.getEmail() != null && !"".equals(eReceipt.getEmail()) ||
+                eReceipt.getContactNo() != null && !"".equals(eReceipt.getContactNo())) {
+
+            EReceiptDataDto eReceiptCustomer = new EReceiptDataDto(
+                    eReceipt.getId(),
+                    transactionCore.getMerchantId(),
+                    transactionCore.getTerminalId(),
+                    transactionCore.getTranType(),
+                    transactionCore.getPaymentMode(),
+                    transactionCore.getCardLabel(),
+                    transactionCore.getInvoiceNo(),
+                    transactionCore.getAuthCode(),
+                    transactionCore.getCurrency(),
+                    transactionCore.getAmount(),
+                    transactionCore.getPan(),
+                    requestDto.getEmail(),
+                    requestDto.getContactNo(),
+                    transactionCore.getDateTime(),
+                    transactionCore.getSignData()
+            );
+            if (eReceipt.getEmail() != null && !"".equals(eReceipt.getEmail())) {
+                eReceipt.setIs_sent_mail(false);
+                eReceipt.setEmail(requestDto.getEmail());
+                eReceiptRepository.save(eReceipt);
+                emailService.sendEmail(eReceiptCustomer.getEmail(), eReceiptCustomer);
+            }
+            if (eReceipt.getContactNo() != null && !"".equals(eReceipt.getContactNo())) {
+                eReceipt.setIsSentSms(false);
+                eReceipt.setContactNo(requestDto.getContactNo());
+                eReceiptRepository.save(eReceipt);
+                smsService.sendSms(eReceiptCustomer.getContactNo(), eReceiptCustomer);
+            }
+        }
+        return "e-Receipt Sent Successfully";
     }
 
     @Override
@@ -60,15 +103,17 @@ public class TransactionDaoImpl implements TransactionDao {
 
         TransactionCore transactionCore = transactionRepository.findById(id).orElseThrow(() -> new NotFoundException("Transaction Not Found"));
 
-        EReceipt eReceipt = eReceiptRepository.findByTransactionCore_Id(id).orElseThrow(() -> new NotFoundException("e-Receipt Info Not Found"));
+        EReceipt eReceipt = eReceiptRepository.findByTransactionCore_IdAndReceiptType(id, "customer_copy").orElseThrow(() -> new NotFoundException("e-Receipt Info Not Found"));
 
         Terminal terminal = terminalRepository.findByTerminalId(transactionCore.getTerminalId()).orElseThrow(() -> new NotFoundException("Terminal Not Found"));
-
         Merchant merchant = merchantRepository.findByMerchantId(transactionCore.getMerchantId()).orElseThrow(() -> new NotFoundException("Merchant Not Found"));
 
-        if (merchant.getIsEmailEnabled()) {
 
-            EReceiptDataDto eReceiptMerchant = new EReceiptDataDto(
+        if (eReceipt.getEmail() != null && !"".equals(eReceipt.getEmail()) ||
+                eReceipt.getContactNo() != null && !"".equals(eReceipt.getContactNo())) {
+
+            EReceiptDataDto eReceiptCustomer = new EReceiptDataDto(
+                    eReceipt.getId(),
                     transactionCore.getMerchantId(),
                     transactionCore.getTerminalId(),
                     transactionCore.getTranType(),
@@ -79,53 +124,23 @@ public class TransactionDaoImpl implements TransactionDao {
                     transactionCore.getCurrency(),
                     transactionCore.getAmount(),
                     transactionCore.getPan(),
-                    merchant.getEmail(),
-                    merchant.getContactNo(),
+                    eReceipt.getEmail(),
+                    eReceipt.getContactNo(),
                     transactionCore.getDateTime(),
                     transactionCore.getSignData()
             );
-            emailService.sendEmail(eReceiptMerchant.getEmail(), eReceiptMerchant);
-        }
-        if (merchant.getIsSmsEnabled()) {
-            EReceiptDataDto eReceiptMerchant = new EReceiptDataDto(
-                    transactionCore.getMerchantId(),
-                    transactionCore.getTerminalId(),
-                    transactionCore.getTranType(),
-                    transactionCore.getPaymentMode(),
-                    transactionCore.getCardLabel(),
-                    transactionCore.getInvoiceNo(),
-                    transactionCore.getAuthCode(),
-                    transactionCore.getCurrency(),
-                    transactionCore.getAmount(),
-                    transactionCore.getPan(),
-                    merchant.getEmail(),
-                    merchant.getContactNo(),
-                    transactionCore.getDateTime(),
-                    transactionCore.getSignData()
-            );
-            smsService.sendSms(eReceiptMerchant.getContactNo(), eReceiptMerchant);
+            if (eReceipt.getEmail() != null && !"".equals(eReceipt.getEmail())) {
+                eReceipt.setIs_sent_mail(false);
+                eReceiptRepository.save(eReceipt);
+                emailService.sendEmail(eReceiptCustomer.getEmail(), eReceiptCustomer);
+            }
+            if (eReceipt.getContactNo() != null && !"".equals(eReceipt.getContactNo())) {
+                eReceipt.setIsSentSms(false);
+                eReceiptRepository.save(eReceipt);
+                smsService.sendSms(eReceiptCustomer.getContactNo(), eReceiptCustomer);
+            }
         }
 
-
-        EReceiptDataDto eReceiptCustomer = new EReceiptDataDto(
-                transactionCore.getMerchantId(),
-                transactionCore.getTerminalId(),
-                transactionCore.getTranType(),
-                transactionCore.getPaymentMode(),
-                transactionCore.getCardLabel(),
-                transactionCore.getInvoiceNo(),
-                transactionCore.getAuthCode(),
-                transactionCore.getCurrency(),
-                transactionCore.getAmount(),
-                transactionCore.getPan(),
-                eReceipt.getEmail(),
-                eReceipt.getContactNo(),
-                transactionCore.getDateTime(),
-                transactionCore.getSignData()
-        );
-
-        emailService.sendEmail(eReceiptCustomer.getEmail(), eReceiptCustomer);
-        smsService.sendSms(eReceiptCustomer.getContactNo(), eReceiptCustomer);
 
 //        Device device = deviceRepository.findById(terminal.getDevice().getId()).orElseThrow(() -> new NotFoundException("Device Not Found"));
 
@@ -175,14 +190,71 @@ public class TransactionDaoImpl implements TransactionDao {
     @Override
     public TransactionResponseDto create(TransactionRequestDto requestDto) throws Exception {
 
+        EReceipt eReceipt = null;
+        EReceipt savedEReceipt = null;
         TransactionCore toInsert = TransactionMapper.toModel(requestDto);
         TransactionCore savedEntity = transactionRepository.save(toInsert);
+
+        if (requestDto.getEmail() != null && !"".equals(requestDto.getEmail()) ||
+                requestDto.getContactNo() != null && !"".equals(requestDto.getContactNo())) {
+            eReceipt = new EReceipt(savedEntity, requestDto.getEmail(), requestDto.getContactNo(), "customer_copy", false, false);
+            savedEReceipt = eReceiptRepository.save(eReceipt);
+
+            EReceiptDataDto eReceiptCustomer = new EReceiptDataDto(
+                    savedEReceipt.getId(),
+                    savedEntity.getMerchantId(),
+                    savedEntity.getTerminalId(),
+                    savedEntity.getTranType(),
+                    savedEntity.getPaymentMode(),
+                    savedEntity.getCardLabel(),
+                    savedEntity.getInvoiceNo(),
+                    savedEntity.getAuthCode(),
+                    savedEntity.getCurrency(),
+                    savedEntity.getAmount(),
+                    savedEntity.getPan(),
+                    eReceipt.getEmail(),
+                    eReceipt.getContactNo(),
+                    savedEntity.getDateTime(),
+                    savedEntity.getSignData()
+            );
+            if (requestDto.getEmail() != null && !"".equals(requestDto.getEmail())) {
+                emailService.sendEmail(eReceiptCustomer.getEmail(), eReceiptCustomer);
+            }
+            if (requestDto.getContactNo() != null && !"".equals(requestDto.getContactNo())) {
+                smsService.sendSms(eReceiptCustomer.getContactNo(), eReceiptCustomer);
+            }
+        }
+
         TransactionResponseDto responseDto = TransactionMapper.toDto(savedEntity);
 
-//        globalAuditEntryRepository.save(new GlobalAuditEntry(resource, UserOperationEnum.CREATE.getValue(),
-//                savedEntity.getId(), null, objectMapper.writeValueAsString(responseDto),
-//                userBeanUtil.getRemoteAdr()));
-
+        Merchant merchant = merchantRepository.findByMerchantId(requestDto.getMerchantId()).orElseThrow(() -> new NotFoundException("Merchant Not Found"));
+        if (merchant.getIsEmailEnabled() || merchant.getIsSmsEnabled()) {
+            eReceipt = new EReceipt(savedEntity, merchant.getEmail(), merchant.getContactNo(), "merchant_copy", false, false);
+            savedEReceipt = eReceiptRepository.save(eReceipt);
+            EReceiptDataDto eReceiptMerchant = new EReceiptDataDto(
+                    savedEReceipt.getId(),
+                    savedEntity.getMerchantId(),
+                    savedEntity.getTerminalId(),
+                    savedEntity.getTranType(),
+                    savedEntity.getPaymentMode(),
+                    savedEntity.getCardLabel(),
+                    savedEntity.getInvoiceNo(),
+                    savedEntity.getAuthCode(),
+                    savedEntity.getCurrency(),
+                    savedEntity.getAmount(),
+                    savedEntity.getPan(),
+                    merchant.getEmail(),
+                    merchant.getContactNo(),
+                    savedEntity.getDateTime(),
+                    savedEntity.getSignData()
+            );
+            if (merchant.getIsEmailEnabled()) {
+                emailService.sendEmail(eReceiptMerchant.getEmail(), eReceiptMerchant);
+            }
+            if (merchant.getIsSmsEnabled()) {
+                smsService.sendSms(eReceiptMerchant.getContactNo(), eReceiptMerchant);
+            }
+        }
         return responseDto;
     }
 

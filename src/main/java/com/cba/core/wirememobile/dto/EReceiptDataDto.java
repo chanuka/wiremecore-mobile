@@ -12,6 +12,8 @@ import java.util.Date;
 @AllArgsConstructor
 @ToString
 public class EReceiptDataDto {
+
+    private Integer id;
     private String merchantId;
     private String terminalId;
     private String tranType;

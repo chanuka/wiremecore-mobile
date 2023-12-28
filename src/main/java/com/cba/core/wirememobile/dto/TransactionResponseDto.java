@@ -42,6 +42,8 @@ public class TransactionResponseDto implements Serializable {
     private String signData;
     private String lat;
     private String lng;
+    private String email;
+    private String contactNo;
     private String respCode;
 
 }

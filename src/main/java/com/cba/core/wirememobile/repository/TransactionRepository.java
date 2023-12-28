@@ -1,5 +1,6 @@
 package com.cba.core.wirememobile.repository;
 
+import com.cba.core.wirememobile.model.EReceipt;
 import com.cba.core.wirememobile.model.TransactionCore;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<TransactionCore, Integer>, JpaSpecificationExecutor<TransactionCore> {
@@ -23,5 +25,9 @@ public interface TransactionRepository extends JpaRepository<TransactionCore, In
     int updateRecordsWithCondition(@Param("isSettled") boolean isSettled, @Param("settledMethod") int settledMethod,
                                    @Param("originId") String originId, @Param("merchantId") String merchantId,
                                    @Param("terminalId") String terminalId, @Param("batchNo") int batchNo);
+
+    @Query("SELECT e FROM TransactionCore e inner join Terminal t on e.terminalId=t.terminalId inner join Device d on t.device.id=d.id " +
+            "WHERE d.serialNo = :serialNo AND e.rrn = :rrn AND e.invoiceNo = :invoiceNo AND e.traceNo = :traceNo")
+    Optional<TransactionCore> findByRrnAndInvoiceNoAndTraceNo(String serialNo, String rrn, Integer invoiceNo, Integer traceNo);
 
 }
