@@ -19,7 +19,8 @@ public interface TransactionResource {
     ResponseEntity<String> generateEReceipt(@Valid @RequestBody EReceiptRequestDto requestDto) throws Exception;
 
     @PostMapping("/e-receipt/{id}")
-    ResponseEntity<String> generateEReceipt(@PathVariable(value = "id") int id) throws Exception;
+    ResponseEntity<String> generateEReceipt(@PathVariable(value = "id") int id,
+                                            @Valid @RequestBody EReceiptMiniRequestDto requestDto) throws Exception;
 
 
     @GetMapping("/summary-device")

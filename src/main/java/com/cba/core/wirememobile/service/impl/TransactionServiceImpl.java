@@ -28,8 +28,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public String generateEReceipt(int id) throws Exception {
-        return transactionDao.generateEReceipt(id);
+    public String generateEReceipt(int id,EReceiptMiniRequestDto requestDto) throws Exception {
+        return transactionDao.generateEReceipt(id,requestDto);
     }
 
     @Override

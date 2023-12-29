@@ -10,7 +10,7 @@ public interface TransactionDao {
 
     String generateEReceipt(EReceiptRequestDto requestDto) throws Exception;
 
-    String generateEReceipt(int id) throws Exception;
+    String generateEReceipt(int id,EReceiptMiniRequestDto requestDto) throws Exception;
 
     void settlement(SettlementRequestDto requestDto) throws Exception;
 

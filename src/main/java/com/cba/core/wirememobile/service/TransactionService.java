@@ -12,7 +12,7 @@ public interface TransactionService {
 
     String generateEReceipt(EReceiptRequestDto requestDto) throws Exception;
 
-    String generateEReceipt(int id) throws Exception;
+    String generateEReceipt(int id,EReceiptMiniRequestDto requestDto) throws Exception;
 
     TransactionResponseDto create(TransactionRequestDto requestDto) throws Exception;
 
