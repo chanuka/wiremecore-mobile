@@ -9,6 +9,7 @@ import com.cba.core.wirememobile.mapper.TransactionMapper;
 import com.cba.core.wirememobile.model.*;
 import com.cba.core.wirememobile.repository.*;
 import com.cba.core.wirememobile.service.EmailService;
+import com.cba.core.wirememobile.service.LocationService;
 import com.cba.core.wirememobile.service.SmsService;
 import com.cba.core.wirememobile.util.DeviceTypeEnum;
 import com.cba.core.wirememobile.util.SettlementMethodEnum;
@@ -43,6 +44,7 @@ public class TransactionDaoImpl implements TransactionDao {
     private final EReceiptRepository eReceiptRepository;
     private final EmailService emailService;
     private final SmsService smsService;
+    private final LocationService locationService;
 
 
     @PersistenceContext
@@ -192,7 +194,30 @@ public class TransactionDaoImpl implements TransactionDao {
         EReceipt eReceipt = null;
         EReceipt savedEReceipt = null;
         TransactionCore toInsert = TransactionMapper.toModel(requestDto);
+
+        Merchant merchant = merchantRepository.findByMerchantId(requestDto.getMerchantId()).orElseThrow(() -> new NotFoundException("Merchant Not Found"));
+        Device device = deviceRepository.findByTransactionTerminal(requestDto.getTerminalId()).orElseThrow(() -> new NotFoundException("Device Not Found"));
+
+        boolean isLocationOutOfRange = locationService.isLocationOutOfRange(
+                requestDto.getLat(), requestDto.getLng(),
+                merchant.getLat(), merchant.getLon(), merchant.getRadius()
+        );
+
+        if (isLocationOutOfRange) {
+            toInsert.setIsAway(true);
+            device.setIsAway(true);
+        } else {
+            toInsert.setIsAway(false);
+            device.setIsAway(false);
+        }
+
+        device.setLat(toInsert.getLat());
+        device.setLon(toInsert.getLon());
+        device.setLastActive(toInsert.getDateTime());
+
+
         TransactionCore savedEntity = transactionRepository.save(toInsert);
+        deviceRepository.save(device);
 
         if (requestDto.getEmail() != null && !"".equals(requestDto.getEmail()) ||
                 requestDto.getContactNo() != null && !"".equals(requestDto.getContactNo())) {
@@ -226,7 +251,6 @@ public class TransactionDaoImpl implements TransactionDao {
 
         TransactionResponseDto responseDto = TransactionMapper.toDto(savedEntity);
 
-        Merchant merchant = merchantRepository.findByMerchantId(requestDto.getMerchantId()).orElseThrow(() -> new NotFoundException("Merchant Not Found"));
         if (merchant.getIsEmailEnabled() || merchant.getIsSmsEnabled()) {
             eReceipt = new EReceipt(savedEntity, merchant.getEmail(), merchant.getContactNo(), "merchant_copy", false, false);
             savedEReceipt = eReceiptRepository.save(eReceipt);

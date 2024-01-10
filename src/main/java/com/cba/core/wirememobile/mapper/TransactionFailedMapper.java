@@ -37,7 +37,7 @@ public class TransactionFailedMapper {
     }
 
     public static TransactionCoreFailed toModel(TransactionRequestDto dto) throws ParseException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMddHHmmss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 
         TransactionCoreFailed entity = new TransactionCoreFailed();
         entity.setAmount(Integer.parseInt(dto.getAmount()));

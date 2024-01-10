@@ -39,8 +39,8 @@ public class TransactionRequestDto implements Serializable {
     private String entryMode;
     private String isDccTransaction;
     private String signData;
-    private String lat;
-    private String lng;
+    private Float lat;
+    private Float lng;
     private String email;
     private String contactNo;
     private String respCode;

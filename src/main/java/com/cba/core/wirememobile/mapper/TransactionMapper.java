@@ -36,7 +36,7 @@ public class TransactionMapper {
     }
 
     public static TransactionCore toModel(TransactionRequestDto dto) throws ParseException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("YYYYMMddHHmmss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 
         TransactionCore entity = new TransactionCore();
         entity.setAmount(Integer.parseInt(dto.getAmount()));
@@ -63,6 +63,8 @@ public class TransactionMapper {
         entity.setSignData(dto.getSignData());
         entity.setPaymentMode(dto.getPaymentMode());
         entity.setTraceNo(Integer.parseInt(dto.getTraceNo()));
+        entity.setLat(dto.getLat());
+        entity.setLon(dto.getLng());
         return entity;
     }
 }
