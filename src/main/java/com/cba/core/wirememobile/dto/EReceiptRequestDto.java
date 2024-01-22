@@ -16,15 +16,15 @@ import java.io.Serializable;
 @ToString
 public class EReceiptRequestDto implements Serializable {
 
-    @NotBlank(message = "serialNo is required")
+    @NotBlank(message = "{validation.e_receipt.serialNo.empty}")
     private String serialNo;
-    @NotBlank(message = "rrn is required")
+    @NotBlank(message = "{validation.e_receipt.rrn.empty}")
     private String rrn;
-    @NotNull(message = "invoiceNo cannot be null")
-    @Min(value = 1, message = "invoiceNo must be greater than or equal to 1")
+    @NotNull(message = "{validation.e_receipt.invoiceNo.positive}")
+    @Min(value = 1, message = "{validation.e_receipt.invoiceNo.positive}")
     private Integer invoiceNo;
-    @NotNull(message = "traceNo cannot be null")
-    @Min(value = 1, message = "traceNo must be greater than or equal to 1")
+    @NotNull(message = "{validation.e_receipt.traceNo.positive}")
+    @Min(value = 1, message = "{validation.e_receipt.traceNo.positive}")
     private Integer traceNo;
     private String email;
     private String contactNo;
