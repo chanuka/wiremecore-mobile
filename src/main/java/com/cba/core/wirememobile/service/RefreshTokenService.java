@@ -7,11 +7,11 @@ import java.util.Optional;
 
 public interface RefreshTokenService {
 
-    public Optional<TokenRefresh> findByToken(String token) throws Exception;
+    Optional<TokenRefresh> findByToken(String token) throws Exception;
 
-    public TokenRefresh createRefreshToken(String userName) throws IOException;
+    TokenRefresh createRefreshToken(String userName) throws IOException;
 
-    public TokenRefresh verifyExpiration(TokenRefresh token);
+    TokenRefresh verifyExpiration(TokenRefresh token); // should be fixed
 
-    public int deleteByUserId(Integer userId) throws Exception;
+    int deleteByUserName(String userName) throws Exception;
 }

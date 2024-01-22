@@ -1,6 +1,6 @@
 package com.cba.core.wirememobile.dao;
 
-import com.cba.core.wirememobile.dto.PermissionResponseDto;
+import com.cba.core.wirememobile.model.Permission;
 import org.springframework.data.domain.Page;
 
 import java.sql.SQLException;
@@ -8,12 +8,12 @@ import java.util.List;
 
 public interface PermissionDao {
 
-    List<PermissionResponseDto> findAllPermissionsByUser(String username) throws SQLException;
+    List<Permission> findAllPermissionsByUser(String username) throws SQLException;
 
-    List<PermissionResponseDto> findAllPermissionsByUser() throws SQLException;
+    List<Permission> findAll() throws Exception;
 
-    Page<PermissionResponseDto> findAll(int page, int pageSize) throws Exception;
+    Page<Permission> findAll(int page, int pageSize) throws Exception;
 
-    PermissionResponseDto findById(int id) throws Exception;
+    Permission findById(int id) throws Exception;
 
 }

@@ -1,20 +1,11 @@
 package com.cba.core.wirememobile.dao;
 
-import com.cba.core.wirememobile.dto.ApplicationUserDto;
-import com.cba.core.wirememobile.dto.ChangePasswordRequestDto;
-import com.cba.core.wirememobile.dto.SuccessAuthResponse;
-import com.cba.core.wirememobile.dto.UsernameAndPasswordAuthenticationRequestDto;
-import com.cba.core.wirememobile.exception.AppSignAuthException;
-import com.cba.core.wirememobile.exception.DeviceAuthException;
+import com.cba.core.wirememobile.model.User;
+import com.cba.core.wirememobile.model.UserType;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public interface CustomUserDetailsDao {
 
-    ApplicationUserDto loadUserByUsername(String username) throws UsernameNotFoundException;
+    User loadUserByUsername(String username, UserType userType) throws UsernameNotFoundException;
 
-    SuccessAuthResponse validateUserDevice(UsernameAndPasswordAuthenticationRequestDto userDto) throws DeviceAuthException, AppSignAuthException;
-
-    boolean validateOTP(String otp) throws Exception;
-
-    String changePassword(ChangePasswordRequestDto requestDto) throws Exception;
 }

@@ -1,27 +1,33 @@
 package com.cba.core.wirememobile.dao;
 
 import com.cba.core.wirememobile.dto.*;
+import com.cba.core.wirememobile.model.EReceipt;
+import com.cba.core.wirememobile.model.TransactionCore;
+import com.cba.core.wirememobile.model.TransactionCoreFailed;
 import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public interface TransactionDao {
 
-    String generateEReceipt(EReceiptRequestDto requestDto) throws Exception;
+    TransactionCore findByRrnAndInvoiceNoAndTraceNo(String serialNo, String rrn, int invoiceNo, int traceNo) throws Exception;
 
-    String generateEReceipt(int id,EReceiptMiniRequestDto requestDto) throws Exception;
+    TransactionCore findById(int id) throws Exception;
 
-    void settlement(SettlementRequestDto requestDto) throws Exception;
+    TransactionCore create(TransactionCore toInsert) throws Exception;
 
-    TransactionResponseDto create(TransactionRequestDto requestDto) throws Exception;
+    TransactionCoreFailed createFailed(TransactionCoreFailed toInsert) throws Exception;
 
-    TransactionResponseDto createFailed(TransactionRequestDto requestDto) throws Exception;
+    int updateRecordsWithCondition(boolean isSettled,int settledMethod,String originId,String merchantId,
+                                   String terminalId,int batchNo) throws Exception;
 
-    SettlementResponseDto updateSettlement(SettlementRequestDto requestDto) throws Exception;
+    Page<TransactionCore> getAllTransactions(String dateFrom, String dateTo, int page, int pageSize) throws Exception;
 
-    Page<TransactionCoreResponseDto> getAllTransactions(String dateFrom, String dateTo, int page, int pageSize) throws Exception;
-
-    Map<String, ArrayList<Map<String, Object>>> getAllTransactionSummary(String dateFrom, String dateTo, String queryBy) throws Exception;
+    List<Object[]> getAllTransactionSummary(String dateFrom, String dateTo, String queryBy,
+                                            String whereClause,
+                                            String selectClause,
+                                            String groupByClause) throws Exception;
 
 }

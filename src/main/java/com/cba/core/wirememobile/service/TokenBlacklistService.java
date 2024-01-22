@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public interface TokenBlacklistService {
 
-    public TokenBlacklist createBlacklistToken(String token) throws Exception;
+     TokenBlacklist createBlacklistToken(String token) throws Exception;
 
-    public boolean isTokenBlacklisted(String token) throws SQLException;
+     boolean isTokenBlacklisted(String token) throws Exception;
 }

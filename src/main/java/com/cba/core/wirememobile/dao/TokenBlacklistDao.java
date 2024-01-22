@@ -3,11 +3,14 @@ package com.cba.core.wirememobile.dao;
 import com.cba.core.wirememobile.model.TokenBlacklist;
 
 import java.sql.SQLException;
+import java.util.Optional;
 
 public interface TokenBlacklistDao {
 
-    public TokenBlacklist createBlacklistToken(String token) throws Exception;
+    TokenBlacklist createBlacklistToken(TokenBlacklist tokenBlacklist) throws Exception;
 
-    public boolean isTokenBlacklisted(String token) throws SQLException;
+//    boolean isTokenBlacklisted(String token) throws SQLException;
+
+    Optional<TokenBlacklist> findByToken(String token) throws Exception;
 
 }

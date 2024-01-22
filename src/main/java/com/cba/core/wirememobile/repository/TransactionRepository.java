@@ -1,6 +1,5 @@
 package com.cba.core.wirememobile.repository;
 
-import com.cba.core.wirememobile.model.EReceipt;
 import com.cba.core.wirememobile.model.TransactionCore;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Date;
 import java.util.Optional;
 
-@Repository
 public interface TransactionRepository extends JpaRepository<TransactionCore, Integer>, JpaSpecificationExecutor<TransactionCore> {
 
     Page<TransactionCore> findByDateTimeBetween(Date fromDate, Date toDate, Pageable pageable);

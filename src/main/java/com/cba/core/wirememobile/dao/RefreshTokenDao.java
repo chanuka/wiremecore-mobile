@@ -1,17 +1,19 @@
 package com.cba.core.wirememobile.dao;
 
 import com.cba.core.wirememobile.model.TokenRefresh;
+import com.cba.core.wirememobile.model.User;
 
 import java.io.IOException;
 import java.util.Optional;
 
 public interface RefreshTokenDao {
 
-    public Optional<TokenRefresh> findByToken(String token) throws Exception;
+    Optional<TokenRefresh> findByToken(String token) throws Exception;
 
-    public TokenRefresh createRefreshToken(String userName) throws IOException;
+    TokenRefresh createRefreshToken(TokenRefresh token) throws IOException;
 
-    public int deleteByUserId(Integer userId) throws Exception;
+    int deleteByUser(User user) throws Exception;
 
-    public TokenRefresh verifyExpiration(TokenRefresh token);
+    void deleteByToken(TokenRefresh token) throws Exception;
+
 }

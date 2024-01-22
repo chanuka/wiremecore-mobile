@@ -2,7 +2,6 @@ package com.cba.core.wirememobile.exception;
 
 import com.cba.core.wirememobile.config.JacksonConfig;
 import com.cba.core.wirememobile.dto.ExceptionResponseDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

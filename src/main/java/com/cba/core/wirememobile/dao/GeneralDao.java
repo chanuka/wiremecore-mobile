@@ -1,9 +1,8 @@
 package com.cba.core.wirememobile.dao;
 
-import com.cba.core.wirememobile.dto.CrashTraceRequestDto;
-import com.cba.core.wirememobile.dto.CrashTraceResponseDto;
+import com.cba.core.wirememobile.model.CrashTrace;
 
 public interface GeneralDao {
 
-    CrashTraceResponseDto create(CrashTraceRequestDto requestDto) throws Exception;
+    CrashTrace create(CrashTrace trace) throws Exception;
 }

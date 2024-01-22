@@ -3,7 +3,6 @@ package com.cba.core.wirememobile.controller;
 import com.cba.core.wirememobile.controller.resource.GeneralResource;
 import com.cba.core.wirememobile.dto.CrashTraceRequestDto;
 import com.cba.core.wirememobile.dto.CrashTraceResponseDto;
-import com.cba.core.wirememobile.dto.TransactionResponseDto;
 import com.cba.core.wirememobile.service.GeneralService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
