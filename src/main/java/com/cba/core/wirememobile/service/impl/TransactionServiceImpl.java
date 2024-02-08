@@ -13,12 +13,9 @@ import com.cba.core.wirememobile.service.SmsService;
 import com.cba.core.wirememobile.service.TransactionService;
 import com.cba.core.wirememobile.util.DeviceTypeEnum;
 import com.cba.core.wirememobile.util.SettlementMethodEnum;
-import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
@@ -98,19 +95,22 @@ public class TransactionServiceImpl implements TransactionService {
     public String generateEReceipt(EReceiptRequestDto requestDto) throws Exception {
         EReceipt eReceipt = null;
         EReceipt savedEReceipt = null;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 
         TransactionCore transactionCore = transactionDao.findByRrnAndInvoiceNoAndTraceNo(
                 requestDto.getSerialNo(),
                 requestDto.getRrn(),
                 requestDto.getInvoiceNo(),
-                requestDto.getTraceNo());
+                requestDto.getTraceNo(),
+                dateFormat.parse(requestDto.getDateTime()));
 
         Terminal terminal = terminalDao.findByTerminalId(transactionCore.getTerminalId());
         Merchant merchant = merchantDao.findByMerchantId(transactionCore.getMerchantId());
 
         if (requestDto.getEmail() != null && !"".equals(requestDto.getEmail()) ||
                 requestDto.getContactNo() != null && !"".equals(requestDto.getContactNo())) {
-            eReceipt = new EReceipt(transactionCore, requestDto.getEmail(), requestDto.getContactNo(), "customer_copy", false, false);
+            eReceipt = new EReceipt(transactionCore, requestDto.getEmail(),
+                    requestDto.getContactNo(), "customer_copy", false, false);
             savedEReceipt = eReceiptDao.create(eReceipt);
 
             EReceiptDataDto eReceiptCustomer = new EReceiptDataDto(

@@ -11,6 +11,7 @@ public class TransactionMapper {
 
     public static TransactionResponseDto toDto(TransactionCore entity) {
         TransactionResponseDto responseDto = new TransactionResponseDto();
+        responseDto.setOriginId(entity.getOriginId());
         responseDto.setAmount(String.valueOf(entity.getAmount()));
         responseDto.setAuthCode(entity.getAuthCode());
         responseDto.setBatchNo(String.valueOf(entity.getBatchNo()));
@@ -24,6 +25,7 @@ public class TransactionMapper {
         responseDto.setId(entity.getId());
         responseDto.setEntryMode(entity.getEntryMode());
         responseDto.setInvoiceNo(String.valueOf(entity.getInvoiceNo()));
+        responseDto.setTerminalId(entity.getTerminalId());
         responseDto.setMerchantId(entity.getMerchantId());
         responseDto.setNii(entity.getNii());
         responseDto.setRrn(entity.getRrn());
@@ -32,6 +34,8 @@ public class TransactionMapper {
         responseDto.setSignData(entity.getSignData());
         responseDto.setPaymentMode(entity.getPaymentMode());
         responseDto.setTraceNo(String.valueOf(entity.getTraceNo()));
+        responseDto.setLat(entity.getLat());
+        responseDto.setLng(entity.getLon());
         return responseDto;
     }
 

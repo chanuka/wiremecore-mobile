@@ -5,13 +5,9 @@ import com.cba.core.wirememobile.dto.PermissionResponseDto;
 import com.cba.core.wirememobile.exception.NotFoundException;
 import com.cba.core.wirememobile.mapper.PermissionMapper;
 import com.cba.core.wirememobile.model.Permission;
-import com.cba.core.wirememobile.repository.GlobalAuditEntryRepository;
 import com.cba.core.wirememobile.service.PermissionService;
-import com.cba.core.wirememobile.util.UserBeanUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 

@@ -2,7 +2,6 @@ package com.cba.core.wirememobile.dao;
 
 import com.cba.core.wirememobile.model.TokenBlacklist;
 
-import java.sql.SQLException;
 import java.util.Optional;
 
 public interface TokenBlacklistDao {

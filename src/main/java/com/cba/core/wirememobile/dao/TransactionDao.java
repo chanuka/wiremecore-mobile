@@ -1,18 +1,15 @@
 package com.cba.core.wirememobile.dao;
 
-import com.cba.core.wirememobile.dto.*;
-import com.cba.core.wirememobile.model.EReceipt;
 import com.cba.core.wirememobile.model.TransactionCore;
 import com.cba.core.wirememobile.model.TransactionCoreFailed;
 import org.springframework.data.domain.Page;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public interface TransactionDao {
 
-    TransactionCore findByRrnAndInvoiceNoAndTraceNo(String serialNo, String rrn, int invoiceNo, int traceNo) throws Exception;
+    TransactionCore findByRrnAndInvoiceNoAndTraceNo(String serialNo, String rrn, int invoiceNo, int traceNo, Date dateTime) throws Exception;
 
     TransactionCore findById(int id) throws Exception;
 

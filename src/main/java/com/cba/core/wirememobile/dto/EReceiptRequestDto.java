@@ -28,6 +28,7 @@ public class EReceiptRequestDto implements Serializable {
     private Integer traceNo;
     private String email;
     private String contactNo;
+    private String dateTime;
 
     private static final long serialVersionUID = 1L;
 

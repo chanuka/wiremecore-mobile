@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.Optional;
@@ -25,7 +24,7 @@ public interface TransactionRepository extends JpaRepository<TransactionCore, In
                                    @Param("terminalId") String terminalId, @Param("batchNo") int batchNo);
 
     @Query("SELECT e FROM TransactionCore e inner join Terminal t on e.terminalId=t.terminalId inner join Device d on t.device.id=d.id " +
-            "WHERE d.serialNo = :serialNo AND e.rrn = :rrn AND e.invoiceNo = :invoiceNo AND e.traceNo = :traceNo")
-    Optional<TransactionCore> findByRrnAndInvoiceNoAndTraceNo(String serialNo, String rrn, Integer invoiceNo, Integer traceNo);
+            "WHERE d.serialNo = :serialNo AND e.rrn = :rrn AND e.invoiceNo = :invoiceNo AND e.traceNo = :traceNo AND e.dateTime= :dateTime")
+    Optional<TransactionCore> findByRrnAndInvoiceNoAndTraceNo(String serialNo, String rrn, Integer invoiceNo, Integer traceNo,Date dateTime);
 
 }

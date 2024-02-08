@@ -1,34 +1,23 @@
 package com.cba.core.wirememobile.dao.impl;
 
 import com.cba.core.wirememobile.dao.TransactionDao;
-import com.cba.core.wirememobile.dto.*;
 import com.cba.core.wirememobile.exception.NotFoundException;
-import com.cba.core.wirememobile.mapper.TransactionCoreMapper;
-import com.cba.core.wirememobile.mapper.TransactionFailedMapper;
-import com.cba.core.wirememobile.mapper.TransactionMapper;
-import com.cba.core.wirememobile.model.*;
-import com.cba.core.wirememobile.repository.*;
-import com.cba.core.wirememobile.service.EmailService;
-import com.cba.core.wirememobile.service.LocationService;
-import com.cba.core.wirememobile.service.SmsService;
-import com.cba.core.wirememobile.util.DeviceTypeEnum;
-import com.cba.core.wirememobile.util.SettlementMethodEnum;
+import com.cba.core.wirememobile.model.TransactionCore;
+import com.cba.core.wirememobile.model.TransactionCoreFailed;
+import com.cba.core.wirememobile.repository.TransactionFailedRepository;
+import com.cba.core.wirememobile.repository.TransactionRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
@@ -41,12 +30,13 @@ public class TransactionDaoImpl implements TransactionDao {
     private EntityManager entityManager;
 
     @Override
-    public TransactionCore findByRrnAndInvoiceNoAndTraceNo(String serialNo, String rrn, int invoiceNo, int traceNo) throws Exception {
+    public TransactionCore findByRrnAndInvoiceNoAndTraceNo(String serialNo, String rrn, int invoiceNo, int traceNo, Date dateTime) throws Exception {
         return transactionRepository.findByRrnAndInvoiceNoAndTraceNo(
                 serialNo,
                 rrn,
                 invoiceNo,
-                traceNo
+                traceNo,
+                dateTime
         ).orElseThrow(() -> new NotFoundException("Transaction Not Found"));
     }
 

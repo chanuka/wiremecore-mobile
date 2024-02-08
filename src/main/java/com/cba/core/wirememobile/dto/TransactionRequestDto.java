@@ -24,9 +24,9 @@ public class TransactionRequestDto implements Serializable {
     private String paymentMode;
     @NotBlank(message = "{validation.transaction.device_serial.empty}")
     private String deviceSerialNo;
-    @NotBlank(message = "{validation.transaction.unique_id.empty}")
+//    @NotBlank(message = "{validation.transaction.unique_id.empty}")
     private String uniqueId;
-    @NotBlank(message = "{validation.transaction.cust_mobile.empty}")
+//    @NotBlank(message = "{validation.transaction.cust_mobile.empty}")
     private String custMobile;
     @NotBlank(message = "{validation.transaction.trans_type.empty}")
     private String transType;
@@ -61,10 +61,10 @@ public class TransactionRequestDto implements Serializable {
     private String isDccTransaction;
     private String signData;
     @NotNull(message = "{validation.transaction.lat.positive}")
-    @Positive(message = "{validation.transaction.lat.positive}")
+//    @Positive(message = "{validation.transaction.lat.positive}")
     private Float lat;
     @NotNull(message = "{validation.transaction.lng.positive}")
-    @Positive(message = "{validation.transaction.lng.positive}")
+//    @Positive(message = "{validation.transaction.lng.positive}")
     private Float lng;
     private String email;
     private String contactNo;

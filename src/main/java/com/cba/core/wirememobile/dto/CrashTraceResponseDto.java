@@ -13,7 +13,6 @@ import java.io.Serializable;
 @ToString
 public class CrashTraceResponseDto implements Serializable {
 
-
     private int id;
     private String time;
     private String trace;
