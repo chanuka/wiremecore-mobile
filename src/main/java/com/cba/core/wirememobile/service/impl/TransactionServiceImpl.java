@@ -114,27 +114,31 @@ public class TransactionServiceImpl implements TransactionService {
             savedEReceipt = eReceiptDao.create(eReceipt);
 
             EReceiptDataDto eReceiptCustomer = new EReceiptDataDto(
-                    savedEReceipt.getId(),
+                    "card-holder-copy",
+                    merchant.getName(),
+                    merchant.getDistrict(),
                     transactionCore.getMerchantId(),
                     transactionCore.getTerminalId(),
+                    transactionCore.getAmount(),
+                    "2023-07-31 07:16:02",
                     transactionCore.getTranType(),
-                    transactionCore.getPaymentMode(),
                     transactionCore.getCardLabel(),
+                    transactionCore.getExpDate(),
                     transactionCore.getInvoiceNo(),
                     transactionCore.getAuthCode(),
+                    transactionCore.getBatchNo(),
+                    transactionCore.getRrn(),
                     transactionCore.getCurrency(),
-                    transactionCore.getAmount(),
                     transactionCore.getPan(),
                     requestDto.getEmail(),
-                    requestDto.getContactNo(),
-                    transactionCore.getDateTime(),
+                    "Subject--",
                     transactionCore.getSignData()
             );
             if (eReceipt.getEmail() != null && !"".equals(eReceipt.getEmail())) {
-                emailService.sendEmail(eReceiptCustomer.getEmail(), eReceiptCustomer);
+                emailService.sendEmail(savedEReceipt.getId(), eReceiptCustomer);
             }
             if (eReceipt.getContactNo() != null && !"".equals(eReceipt.getContactNo())) {
-                smsService.sendSms(eReceiptCustomer.getContactNo(), eReceiptCustomer);
+                smsService.sendSms(requestDto.getContactNo(), eReceiptCustomer);
             }
         }
         return "e-Receipt Sent Successfully";
@@ -156,27 +160,31 @@ public class TransactionServiceImpl implements TransactionService {
             savedEReceipt = eReceiptDao.create(eReceipt);
 
             EReceiptDataDto eReceiptCustomer = new EReceiptDataDto(
-                    savedEReceipt.getId(),
+                    "card-holder-copy",
+                    merchant.getName(),
+                    merchant.getDistrict(),
                     transactionCore.getMerchantId(),
                     transactionCore.getTerminalId(),
+                    transactionCore.getAmount(),
+                    "2023-07-31 07:16:02",
                     transactionCore.getTranType(),
-                    transactionCore.getPaymentMode(),
                     transactionCore.getCardLabel(),
+                    transactionCore.getExpDate(),
                     transactionCore.getInvoiceNo(),
                     transactionCore.getAuthCode(),
+                    transactionCore.getBatchNo(),
+                    transactionCore.getRrn(),
                     transactionCore.getCurrency(),
-                    transactionCore.getAmount(),
                     transactionCore.getPan(),
                     requestDto.getEmail(),
-                    requestDto.getContactNo(),
-                    transactionCore.getDateTime(),
+                    "Subject--",
                     transactionCore.getSignData()
             );
             if (requestDto.getEmail() != null && !"".equals(requestDto.getEmail())) {
-                emailService.sendEmail(eReceiptCustomer.getEmail(), eReceiptCustomer);
+                emailService.sendEmail(savedEReceipt.getId(), eReceiptCustomer);
             }
             if (requestDto.getContactNo() != null && !"".equals(requestDto.getContactNo())) {
-                smsService.sendSms(eReceiptCustomer.getContactNo(), eReceiptCustomer);
+                smsService.sendSms(requestDto.getContactNo(), eReceiptCustomer);
             }
         }
 
@@ -212,66 +220,75 @@ public class TransactionServiceImpl implements TransactionService {
         device.setLastActive(toInsert.getDateTime());
 
 
-        TransactionCore savedEntity = transactionDao.create(toInsert);
+        TransactionCore transactionCore = transactionDao.create(toInsert);
         deviceDao.create(device);
 
         if (requestDto.getEmail() != null && !"".equals(requestDto.getEmail()) ||
                 requestDto.getContactNo() != null && !"".equals(requestDto.getContactNo())) {
-            eReceipt = new EReceipt(savedEntity, requestDto.getEmail(), requestDto.getContactNo(), "customer_copy", false, false);
+            eReceipt = new EReceipt(transactionCore, requestDto.getEmail(), requestDto.getContactNo(), "customer_copy", false, false);
             savedEReceipt = eReceiptDao.create(eReceipt);
 
             EReceiptDataDto eReceiptCustomer = new EReceiptDataDto(
-                    savedEReceipt.getId(),
-                    savedEntity.getMerchantId(),
-                    savedEntity.getTerminalId(),
-                    savedEntity.getTranType(),
-                    savedEntity.getPaymentMode(),
-                    savedEntity.getCardLabel(),
-                    savedEntity.getInvoiceNo(),
-                    savedEntity.getAuthCode(),
-                    savedEntity.getCurrency(),
-                    savedEntity.getAmount(),
-                    savedEntity.getPan(),
+                    "card-holder-copy",
+                    merchant.getName(),
+                    merchant.getDistrict(),
+                    transactionCore.getMerchantId(),
+                    transactionCore.getTerminalId(),
+                    transactionCore.getAmount(),
+                    "2023-07-31 07:16:02",
+                    transactionCore.getTranType(),
+                    transactionCore.getCardLabel(),
+                    transactionCore.getExpDate(),
+                    transactionCore.getInvoiceNo(),
+                    transactionCore.getAuthCode(),
+                    transactionCore.getBatchNo(),
+                    transactionCore.getRrn(),
+                    transactionCore.getCurrency(),
+                    transactionCore.getPan(),
                     eReceipt.getEmail(),
-                    eReceipt.getContactNo(),
-                    savedEntity.getDateTime(),
-                    savedEntity.getSignData()
+                    "Subject--",
+                    transactionCore.getSignData()
             );
             if (requestDto.getEmail() != null && !"".equals(requestDto.getEmail())) {
-                emailService.sendEmail(eReceiptCustomer.getEmail(), eReceiptCustomer);
+                emailService.sendEmail(savedEReceipt.getId(),eReceiptCustomer);
             }
             if (requestDto.getContactNo() != null && !"".equals(requestDto.getContactNo())) {
-                smsService.sendSms(eReceiptCustomer.getContactNo(), eReceiptCustomer);
+                smsService.sendSms(requestDto.getContactNo(), eReceiptCustomer);
             }
         }
 
-        TransactionResponseDto responseDto = TransactionMapper.toDto(savedEntity);
+        TransactionResponseDto responseDto = TransactionMapper.toDto(transactionCore);
 
         if (merchant.getIsEmailEnabled() || merchant.getIsSmsEnabled()) {
-            eReceipt = new EReceipt(savedEntity, merchant.getEmail(), merchant.getContactNo(), "merchant_copy", false, false);
+            eReceipt = new EReceipt(transactionCore, merchant.getEmail(), merchant.getContactNo(), "merchant_copy", false, false);
             savedEReceipt = eReceiptDao.create(eReceipt);
+
             EReceiptDataDto eReceiptMerchant = new EReceiptDataDto(
-                    savedEReceipt.getId(),
-                    savedEntity.getMerchantId(),
-                    savedEntity.getTerminalId(),
-                    savedEntity.getTranType(),
-                    savedEntity.getPaymentMode(),
-                    savedEntity.getCardLabel(),
-                    savedEntity.getInvoiceNo(),
-                    savedEntity.getAuthCode(),
-                    savedEntity.getCurrency(),
-                    savedEntity.getAmount(),
-                    savedEntity.getPan(),
+                    "merchant-copy",
+                    merchant.getName(),
+                    merchant.getDistrict(),
+                    transactionCore.getMerchantId(),
+                    transactionCore.getTerminalId(),
+                    transactionCore.getAmount(),
+                    "2023-07-31 07:16:02",
+                    transactionCore.getTranType(),
+                    transactionCore.getCardLabel(),
+                    transactionCore.getExpDate(),
+                    transactionCore.getInvoiceNo(),
+                    transactionCore.getAuthCode(),
+                    transactionCore.getBatchNo(),
+                    transactionCore.getRrn(),
+                    transactionCore.getCurrency(),
+                    transactionCore.getPan(),
                     merchant.getEmail(),
-                    merchant.getContactNo(),
-                    savedEntity.getDateTime(),
-                    savedEntity.getSignData()
+                    "Subject--",
+                    transactionCore.getSignData()
             );
             if (merchant.getIsEmailEnabled()) {
-                emailService.sendEmail(eReceiptMerchant.getEmail(), eReceiptMerchant);
+                emailService.sendEmail(savedEReceipt.getId(),eReceiptMerchant);
             }
             if (merchant.getIsSmsEnabled()) {
-                smsService.sendSms(eReceiptMerchant.getContactNo(), eReceiptMerchant);
+                smsService.sendSms(merchant.getContactNo(), eReceiptMerchant);
             }
         }
         return responseDto;

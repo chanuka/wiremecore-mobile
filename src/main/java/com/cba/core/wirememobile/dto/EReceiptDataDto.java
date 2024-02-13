@@ -5,29 +5,30 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.util.Date;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 public class EReceiptDataDto {
 
-    private Integer id;
-    private String merchantId;
-    private String terminalId;
-    private String tranType;
-    private String paymentMode;
+    private String receiptType;
+    private String merchantName;
+    private String merchantAddress;
+    private String mid;
+    private String tid;
+    private Integer amount;
+    private String timestamp;
+    private String transType;
     private String cardLabel;
+    private String expDate;
     private Integer invoiceNo;
     private String authCode;
+    private Integer batchNo;
+    private String rrn;
     private String currency;
-    private Integer amount;
     private String pan;
-    private String email;
-    private String contactNo;
-    private Date dateTime;
+    private String to;
+    private String subject;
     private String signData;
-
 
 }

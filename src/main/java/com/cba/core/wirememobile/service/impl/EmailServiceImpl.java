@@ -6,100 +6,90 @@ import com.cba.core.wirememobile.exception.NotFoundException;
 import com.cba.core.wirememobile.model.EReceipt;
 import com.cba.core.wirememobile.repository.EReceiptRepository;
 import com.cba.core.wirememobile.service.EmailService;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring5.SpringTemplateEngine;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class EmailServiceImpl implements EmailService {
 
-    private final JavaMailSender javaMailSender;
-    private final SpringTemplateEngine templateEngine;
+
+    @Value("${application.email.url}")
+    private String emailUrl;
+
+    private final RestTemplate restTemplate;
     private final EReceiptRepository eReceiptRepository;
 
 //    @Qualifier("asyncExecutor")
 //    private final TaskExecutor taskExecutor;
 
+
     @Override
     @Async("asyncExecutor")
-    public void sendEmail(EmailRequestDto emailRequestDto) throws MessagingException, IOException {
-        MimeMessage message = javaMailSender.createMimeMessage();
+    public void sendEmail(String userMail, String messageBody) throws Exception {
+        try {
 
-        MimeMessageHelper helper = new MimeMessageHelper(message,
-                MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-                StandardCharsets.UTF_8.name());
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            EmailRequestDto emailRequestDto = new EmailRequestDto();
+            emailRequestDto.setTo(userMail);
+            emailRequestDto.setBody(messageBody);
+            emailRequestDto.setSubject("This is auto generated email - include credentials/OTP");
+            emailRequestDto.setIsHtml(false);
 
-        helper.addAttachment("template-cover.png", new ClassPathResource("static/javabydeveloper-email.PNG"));
+            HttpEntity<EmailRequestDto> requestEntity = new HttpEntity<>(emailRequestDto, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(emailUrl + "/email", requestEntity, String.class);
 
-        Context context = new Context();
-        context.setVariables(emailRequestDto.getProps());
-
-        final String template = emailRequestDto.getProps().get("type").equals("NEWSLETTER") ? "newsletter-template" : "inlined-css-template";
-        String html = templateEngine.process(template, context);
-
-        helper.setTo(emailRequestDto.getMailTo());
-        helper.setText(html, true);
-        helper.setSubject(emailRequestDto.getSubject());
-//        helper.setFrom(emailRequestDto.getFrom());
-
-        javaMailSender.send(message);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                String responseData = response.getBody();
+                // Process responseData here
+                System.out.println("Response: " + responseData);
+            } else {
+                System.out.println("Error occurred. Status code: " + response.getStatusCodeValue());
+                // Handle other error cases
+            }
+        } catch (Exception ex) {
+            System.out.println("Error occurred: " + ex.getMessage());
+            // Handle exceptions
+        }
     }
 
     @Override
     @Async("asyncExecutor")
-    public void sendEmail(String userMail, String messageBody) throws MessagingException, IOException {
-        MimeMessage message = javaMailSender.createMimeMessage();
+    public void sendEmail(int id, EReceiptDataDto data) throws Exception {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
 
-        MimeMessageHelper helper = new MimeMessageHelper(message,
-                MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-                StandardCharsets.UTF_8.name());
+            HttpEntity<EReceiptDataDto> requestEntity = new HttpEntity<>(data, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(emailUrl + "/receipt-email", requestEntity, String.class);
 
-        helper.setTo(userMail);
-        helper.setText(messageBody);
-        helper.setSubject("This is auto generated email - include credentials/OTP");
-//        helper.setFrom(emailRequestDto.getFrom());
+            if (response.getStatusCode().is2xxSuccessful()) {
+                String responseData = response.getBody();
+                // Process responseData here
+                System.out.println("Response: " + responseData);
 
-        javaMailSender.send(message);
-    }
+                EReceipt eReceipt = eReceiptRepository.findById(id).orElseThrow(() -> new NotFoundException("e-Receipt Info Not Found"));
+                eReceipt.setIs_sent_mail(true);
+                eReceiptRepository.save(eReceipt);
+            } else {
+                System.out.println("Error occurred. Status code: " + response.getStatusCode().value());
+                // Handle other error cases
+            }
+        } catch (Exception ex) {
+            System.out.println("Error occurred: " + ex.getMessage());
+            // Handle exceptions
+        }
 
-    @Override
-    @Async("asyncExecutor")
-    public void sendEmail(String userMail, EReceiptDataDto data) throws Exception {
 
-
-        Thread.sleep(5000);
-        MimeMessage message = javaMailSender.createMimeMessage();
-
-        MimeMessageHelper helper = new MimeMessageHelper(message,
-                MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-                StandardCharsets.UTF_8.name());
-
-        helper.setTo(userMail);
-        helper.setText("A " + data.getPaymentMode() + " " + data.getTranType() + " tx on your " + data.getCardLabel() +
-                " card " + data.getPan() + " for " + data.getCurrency() + data.getAmount() + " on " + data.getDateTime() +
-                " at '12:18:58 PM', bearing Inv-No " + data.getInvoiceNo() + ", Auth-Code " + data.getAuthCode() + " is approved.\n");
-
-        helper.setSubject("This is auto generated email - include e-Receipt");
-//        helper.setFrom(emailRequestDto.getFrom());
-
-        javaMailSender.send(message);
-
-        EReceipt eReceipt = eReceiptRepository.findById(data.getId()).orElseThrow(() -> new NotFoundException("e-Receipt Info Not Found"));
-        eReceipt.setIs_sent_mail(true);
-        eReceiptRepository.save(eReceipt);
-        System.out.println("Copy of e-Receipt mail has been sent successfully.!!!");
     }
 }

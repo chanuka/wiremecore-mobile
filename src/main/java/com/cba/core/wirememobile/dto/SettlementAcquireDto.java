@@ -17,4 +17,16 @@ public class SettlementAcquireDto implements java.io.Serializable {
     private String merchantId;
     private int settledMethod;
     private int batchNo;
+    private String settledDate;
+    private int saleCount;
+    private int saleAmount;
+    private int saleVoidCount;
+    private int saleVoidAmount;
+    private int offlineCount;
+    private int offlineAmount;
+    private int offlineVoidCount;
+    private int offlineVoidAmount;
+    private int precompCount;
+    private int precompAmount;
+
 }

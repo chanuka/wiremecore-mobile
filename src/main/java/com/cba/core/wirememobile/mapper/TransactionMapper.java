@@ -62,13 +62,21 @@ public class TransactionMapper {
         entity.setOriginId(dto.getOriginId());
         entity.setRrn(dto.getRrn());
         entity.setTerminalId(dto.getTerminalId());
-        entity.setTranType("SALE");
+        entity.setTranType(dto.getTransType());
         entity.setPan(dto.getPan());
         entity.setSignData(dto.getSignData());
         entity.setPaymentMode(dto.getPaymentMode());
         entity.setTraceNo(Integer.parseInt(dto.getTraceNo()));
         entity.setLat(dto.getLat());
         entity.setLon(dto.getLng());
+        entity.setOriAuthCode(dto.getOriAuthCode());
+        entity.setOriBatchNo(dto.getOriBatchNo());
+        entity.setOriRrn(dto.getOriRrn());
+        entity.setOriTranType(dto.getOriTransType());
+        entity.setOriTraceNo(dto.getOriTraceNo());
+        if (dto.getOriDateTime() != null && !dto.getOriDateTime().isEmpty()) {
+            entity.setOriDateTime(dateFormat.parse(dto.getOriDateTime()));
+        }
         return entity;
     }
 }

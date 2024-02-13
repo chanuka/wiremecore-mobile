@@ -59,12 +59,13 @@ public class TransactionFailedMapper {
         entity.setOriginId(dto.getOriginId());
         entity.setRrn(dto.getRrn());
         entity.setTerminalId(dto.getTerminalId());
-        entity.setTranType("SALE");
+        entity.setTranType(dto.getTransType());
         entity.setPan(dto.getPan());
         entity.setSignData(dto.getSignData());
         entity.setPaymentMode(dto.getPaymentMode());
         entity.setTraceNo(Integer.parseInt(dto.getTraceNo()));
         entity.setRespCode(Integer.parseInt(dto.getRespCode()));
+
         return entity;
     }
 }
