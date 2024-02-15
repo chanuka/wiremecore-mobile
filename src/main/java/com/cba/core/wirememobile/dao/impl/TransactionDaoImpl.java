@@ -58,7 +58,7 @@ public class TransactionDaoImpl implements TransactionDao {
 
     @Override
     public int updateRecordsWithCondition(boolean isSettled, int settledMethod, String originId, String merchantId,
-                                          String terminalId, int batchNo) throws Exception {
+                                          String terminalId, int batchNo) throws RuntimeException {
         return transactionRepository.updateRecordsWithCondition(true, settledMethod, originId,
                 merchantId, terminalId, batchNo);
     }

@@ -14,7 +14,12 @@ public class TerminalDaoImpl implements TerminalDao {
     private final TerminalRepository repository;
 
     @Override
-    public Terminal findByTerminalId(String terminalId) throws Exception {
+    public Terminal findByTerminalId(String terminalId) throws RuntimeException {
         return repository.findByTerminalId(terminalId).orElseThrow(() -> new NotFoundException("Terminal Not Found"));
+    }
+
+    @Override
+    public Terminal findByTerminalIdAndMerchant_MerchantIdAndDevice_SerialNo(String terminalId, String merchantId,String serialNo) throws RuntimeException {
+        return repository.findByTerminalIdAndMerchant_MerchantIdAndDevice_SerialNo(terminalId, merchantId,serialNo).orElseThrow(() -> new NotFoundException("Terminal Not Found"));
     }
 }

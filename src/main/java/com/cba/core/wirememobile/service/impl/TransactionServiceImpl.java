@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,6 +42,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public void settlement(SettlementRequestDto requestDto) throws Exception {
+
         if (requestDto.getSettleAcquirers() == null || requestDto.getSettleAcquirers().isEmpty()) {
             throw new NotFoundException("No Terminals for settle");
         }
@@ -59,63 +61,52 @@ public class TransactionServiceImpl implements TransactionService {
         }
         requestDto.getSettleAcquirers().stream().forEach((settleObj) -> {
 
-            Merchant merchant = null;
-            try {
-                merchant = merchantDao.findByMerchantId(settleObj.getMerchantId());
-            } catch (Exception exception) {
-                exception.printStackTrace(); // this has to be handle properly
-            }
+            Terminal terminal = terminalDao.findByTerminalIdAndMerchant_MerchantIdAndDevice_SerialNo
+                    (settleObj.getTerminalId(), settleObj.getMerchantId(), requestDto.getDeviceSerialNo());
+
+            Merchant merchant = merchantDao.findByMerchantId(settleObj.getMerchantId());
+
             if (!"ACTV".equals(merchant.getStatus().getStatusCode())) {
                 throw new NotFoundException("Merchant is not Active");
-            }
-            Terminal terminal = null;
-            try {
-                terminal = terminalDao.findByTerminalId(settleObj.getTerminalId());
-            } catch (Exception exception) {
-                exception.printStackTrace();// this has to be handle properly
             }
             if (!"ACTV".equals(terminal.getStatus().getStatusCode())) {
                 throw new NotFoundException("Terminal is not Active");
             }
-
             if (settleObj.getSettledMethod() != SettlementMethodEnum.AUTO.getValue() &&
                     settleObj.getSettledMethod() != SettlementMethodEnum.MANUAL.getValue()) {
                 throw new NotFoundException("Invalid Settlement Method");
             }
-            try {
-                transactionDao.updateRecordsWithCondition(true, settleObj.getSettledMethod(), requestDto.getOriginId(),
-                        settleObj.getMerchantId(), settleObj.getTerminalId(), settleObj.getBatchNo());
 
-                SettlementEmailDto settlementEmailDto = new SettlementEmailDto();
-                settlementEmailDto.setSubject("This is system generated settlement e-receipt");
-                settlementEmailDto.setMid(merchant.getMerchantId());
-                settlementEmailDto.setTid(terminal.getTerminalId());
-                settlementEmailDto.setMerchantName(merchant.getName());
-                settlementEmailDto.setTo(merchant.getEmail());
-                settlementEmailDto.setMerchantAddress(merchant.getAddress());
-                settlementEmailDto.setTimestamp("");
-                settlementEmailDto.setAmount(settleObj.getSaleAmount().toString());
-                settlementEmailDto.setBatchNo(settleObj.getBatchNo());
-                settlementEmailDto.setSaleAmount(settleObj.getSaleAmount());
-                settlementEmailDto.setSaleCount(settleObj.getSaleCount());
-                settlementEmailDto.setSaleVoidAmount(settleObj.getSaleVoidAmount());
-                settlementEmailDto.setSaleVoidCount(settleObj.getSaleVoidCount());
-                settlementEmailDto.setPrecompAmount(settleObj.getPrecompAmount());
-                settlementEmailDto.setPrecompCount(settleObj.getPrecompCount());
-                settlementEmailDto.setPrecompVoidAmount(settleObj.getPrecompVoidAmount());
-                settlementEmailDto.setPrecompVoidCount(settleObj.getPrecompVoidCount());
-                settlementEmailDto.setOfflineAmount(settleObj.getOfflineAmount());
-                settlementEmailDto.setOfflineCount(settleObj.getOfflineCount());
-                settlementEmailDto.setOfflineVoidAmount(settleObj.getOfflineVoidAmount());
-                settlementEmailDto.setOfflineVoidCount(settleObj.getOfflineVoidCount());
-                emailService.sendEmail(settlementEmailDto);
+            transactionDao.updateRecordsWithCondition(true, settleObj.getSettledMethod(), requestDto.getOriginId(),
+                    settleObj.getMerchantId(), settleObj.getTerminalId(), settleObj.getBatchNo());
 
-
-            } catch (Exception exception) {
-                exception.printStackTrace();// this has to be handle properly
-            }
+            SettlementEmailDto settlementEmailDto = new SettlementEmailDto();
+            settlementEmailDto.setSubject("This is system generated settlement e-receipt");
+            settlementEmailDto.setMid(merchant.getMerchantId());
+            settlementEmailDto.setTid(terminal.getTerminalId());
+            settlementEmailDto.setMerchantName(merchant.getName());
+            settlementEmailDto.setTo(merchant.getEmail());
+            settlementEmailDto.setMerchantAddress(merchant.getAddress());
+            settlementEmailDto.setTimestamp("");
+            settlementEmailDto.setAmount(settleObj.getSaleAmount().toString());
+            settlementEmailDto.setBatchNo(settleObj.getBatchNo());
+            settlementEmailDto.setSaleAmount(settleObj.getSaleAmount());
+            settlementEmailDto.setSaleCount(settleObj.getSaleCount());
+            settlementEmailDto.setSaleVoidAmount(settleObj.getSaleVoidAmount());
+            settlementEmailDto.setSaleVoidCount(settleObj.getSaleVoidCount());
+            settlementEmailDto.setPrecompAmount(settleObj.getPrecompAmount());
+            settlementEmailDto.setPrecompCount(settleObj.getPrecompCount());
+            settlementEmailDto.setPrecompVoidAmount(settleObj.getPrecompVoidAmount());
+            settlementEmailDto.setPrecompVoidCount(settleObj.getPrecompVoidCount());
+            settlementEmailDto.setOfflineAmount(settleObj.getOfflineAmount());
+            settlementEmailDto.setOfflineCount(settleObj.getOfflineCount());
+            settlementEmailDto.setOfflineVoidAmount(settleObj.getOfflineVoidAmount());
+            settlementEmailDto.setOfflineVoidCount(settleObj.getOfflineVoidCount());
+            emailService.sendEmail(settlementEmailDto);
 
         });
+
+
     }
 
     @Override
@@ -224,9 +215,12 @@ public class TransactionServiceImpl implements TransactionService {
         EReceipt savedEReceipt = null;
         TransactionCore toInsert = TransactionMapper.toModel(requestDto);
 
-        Terminal terminal = terminalDao.findByTerminalId(toInsert.getTerminalId());
-        Merchant merchant = merchantDao.findByMerchantId(toInsert.getMerchantId());
-        Device device = deviceDao.findByTransactionTerminal(requestDto.getTerminalId());
+        Terminal terminal = terminalDao.findByTerminalIdAndMerchant_MerchantIdAndDevice_SerialNo
+                (requestDto.getTerminalId(), requestDto.getMerchantId(), requestDto.getDeviceSerialNo());
+
+
+        Merchant merchant = merchantDao.findByMerchantId(requestDto.getMerchantId());
+        Device device = deviceDao.findByTransactionTerminal(requestDto.getTerminalId(), requestDto.getDeviceSerialNo());
 
 
         boolean isLocationOutOfRange = locationService.isLocationOutOfRange(
@@ -323,6 +317,13 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public TransactionResponseDto createFailed(TransactionRequestDto requestDto) throws Exception {
+
+
+        Terminal terminal = terminalDao.findByTerminalIdAndMerchant_MerchantIdAndDevice_SerialNo
+                (requestDto.getTerminalId(), requestDto.getMerchantId(), requestDto.getDeviceSerialNo());
+//        Merchant merchant = merchantDao.findByMerchantId(requestDto.getMerchantId());
+//        Device device = deviceDao.findByTransactionTerminal(requestDto.getTerminalId(), requestDto.getDeviceSerialNo());
+
         TransactionCoreFailed toInsert = TransactionFailedMapper.toModel(requestDto);
         TransactionCoreFailed savedEntity = transactionDao.createFailed(toInsert);
         TransactionResponseDto responseDto = TransactionFailedMapper.toDto(savedEntity);

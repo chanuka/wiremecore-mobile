@@ -19,8 +19,8 @@ public class DeviceDaoImpl implements DeviceDao {
     }
 
     @Override
-    public Device findByTransactionTerminal(String terminalId) throws Exception {
-        return repository.findByTransactionTerminal(terminalId).orElseThrow(() -> new NotFoundException("Device Not Found"));
+    public Device findByTransactionTerminal(String terminalId, String serialNo) throws Exception {
+        return repository.findByTransactionTerminal(terminalId, serialNo).orElseThrow(() -> new NotFoundException("Device Not Found"));
     }
 
     @Override

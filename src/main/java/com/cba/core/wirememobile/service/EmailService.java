@@ -9,6 +9,6 @@ public interface EmailService {
 
     void sendEmail(int id,EReceiptDataDto data) throws Exception;
 
-    void sendEmail(SettlementEmailDto settlementEmailDto) throws Exception;
+    void sendEmail(SettlementEmailDto settlementEmailDto) throws RuntimeException;
 
 }

@@ -6,7 +6,7 @@ public interface DeviceDao {
 
     Device create(Device device) throws Exception;
 
-    Device findByTransactionTerminal(String terminalId) throws Exception;
+    Device findByTransactionTerminal(String terminalId, String serialNo) throws Exception;
 
     Device findBySerialNo(String serialNo) throws Exception;
 }

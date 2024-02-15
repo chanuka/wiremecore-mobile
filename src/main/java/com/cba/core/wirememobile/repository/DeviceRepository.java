@@ -13,8 +13,9 @@ public interface DeviceRepository extends JpaRepository<Device, Integer>, JpaSpe
 
     Optional<Device> findBySerialNo(String serialNo);
 
-    @Query("SELECT d FROM Device d WHERE d.id = (SELECT t.device.id from Terminal t WHERE t.terminalId= :terminalId)")
-    Optional<Device> findByTransactionTerminal(String terminalId);
+    //    @Query("SELECT d FROM Device d WHERE d.id = (SELECT t.device.id from Terminal t WHERE t.terminalId= :terminalId)")
+    @Query("SELECT d FROM Terminal t inner join Device d on t.device.id =d.id WHERE t.terminalId = :terminalId and d.serialNo = :serialNo")
+    Optional<Device> findByTransactionTerminal(String terminalId, String serialNo);
 
 
 }

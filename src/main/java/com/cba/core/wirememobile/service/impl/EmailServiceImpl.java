@@ -96,7 +96,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     @Async("asyncExecutor")
-    public void sendEmail(SettlementEmailDto settlementEmailDto) throws Exception {
+    public void sendEmail(SettlementEmailDto settlementEmailDto) throws RuntimeException {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
