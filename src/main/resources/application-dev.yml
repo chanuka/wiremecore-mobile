@@ -81,7 +81,7 @@ springdoc:
 
 swagger:
   server:
-    url: http://localhost:8092/wireme-coremobile
+    url: http://localhost:8092/wireme-coremobile/core/v1
 
 # this is to activate spring actuator
 management:

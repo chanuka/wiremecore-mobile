@@ -81,7 +81,7 @@ springdoc:
 
 swagger:
   server:
-    url: http://123.231.95.112:8092/wireme-coremobile
+    url: http://123.231.95.112:8092/wireme-coremobile/core/v1
 
 management:
   endpoints:

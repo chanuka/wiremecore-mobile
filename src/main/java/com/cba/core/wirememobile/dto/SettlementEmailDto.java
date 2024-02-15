@@ -1,23 +1,28 @@
 package com.cba.core.wirememobile.dto;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class SettlementAcquireDto implements java.io.Serializable {
+public class SettlementEmailDto implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
-    private String terminalId;
-    private String merchantId;
-    private Integer settledMethod;
+    private String tid;
+    private String mid;
+    private String amount;
+    private String timestamp;
     private Integer batchNo;
-    private String settledDate;
+    private String to;
+    private String subject;
+    private String merchantName;
+    private String merchantAddress;
     private Integer saleCount;
     private Float saleAmount;
     private Integer saleVoidCount;
@@ -30,5 +35,7 @@ public class SettlementAcquireDto implements java.io.Serializable {
     private Float precompAmount;
     private Integer precompVoidCount;
     private Float precompVoidAmount;
+
+    private static final long serialVersionUID = 1L;
 
 }

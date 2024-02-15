@@ -42,7 +42,7 @@ public interface TransactionResource {
     @PutMapping("/settle-state")
     ResponseEntity<String> settleTransaction(@Valid @RequestBody SettlementRequestDto requestDto) throws Exception;
 
-    @PostMapping("/failed")
+    @PostMapping("/failed-transactions")
     ResponseEntity<TransactionResponseDto> createFailedTransaction(@Valid @RequestBody TransactionRequestDto requestDto) throws Exception;
 
     @PostMapping()

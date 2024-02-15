@@ -85,9 +85,36 @@ public class TransactionServiceImpl implements TransactionService {
             try {
                 transactionDao.updateRecordsWithCondition(true, settleObj.getSettledMethod(), requestDto.getOriginId(),
                         settleObj.getMerchantId(), settleObj.getTerminalId(), settleObj.getBatchNo());
+
+                SettlementEmailDto settlementEmailDto = new SettlementEmailDto();
+                settlementEmailDto.setSubject("This is system generated settlement e-receipt");
+                settlementEmailDto.setMid(merchant.getMerchantId());
+                settlementEmailDto.setTid(terminal.getTerminalId());
+                settlementEmailDto.setMerchantName(merchant.getName());
+                settlementEmailDto.setTo(merchant.getEmail());
+                settlementEmailDto.setMerchantAddress(merchant.getAddress());
+                settlementEmailDto.setTimestamp("");
+                settlementEmailDto.setAmount(settleObj.getSaleAmount().toString());
+                settlementEmailDto.setBatchNo(settleObj.getBatchNo());
+                settlementEmailDto.setSaleAmount(settleObj.getSaleAmount());
+                settlementEmailDto.setSaleCount(settleObj.getSaleCount());
+                settlementEmailDto.setSaleVoidAmount(settleObj.getSaleVoidAmount());
+                settlementEmailDto.setSaleVoidCount(settleObj.getSaleVoidCount());
+                settlementEmailDto.setPrecompAmount(settleObj.getPrecompAmount());
+                settlementEmailDto.setPrecompCount(settleObj.getPrecompCount());
+                settlementEmailDto.setPrecompVoidAmount(settleObj.getPrecompVoidAmount());
+                settlementEmailDto.setPrecompVoidCount(settleObj.getPrecompVoidCount());
+                settlementEmailDto.setOfflineAmount(settleObj.getOfflineAmount());
+                settlementEmailDto.setOfflineCount(settleObj.getOfflineCount());
+                settlementEmailDto.setOfflineVoidAmount(settleObj.getOfflineVoidAmount());
+                settlementEmailDto.setOfflineVoidCount(settleObj.getOfflineVoidCount());
+                emailService.sendEmail(settlementEmailDto);
+
+
             } catch (Exception exception) {
                 exception.printStackTrace();// this has to be handle properly
             }
+
         });
     }
 
@@ -131,7 +158,7 @@ public class TransactionServiceImpl implements TransactionService {
                     transactionCore.getCurrency(),
                     transactionCore.getPan(),
                     requestDto.getEmail(),
-                    "Subject--",
+                    "This is system generated transaction e-receipt--",
                     transactionCore.getSignData()
             );
             if (eReceipt.getEmail() != null && !"".equals(eReceipt.getEmail())) {
@@ -177,7 +204,7 @@ public class TransactionServiceImpl implements TransactionService {
                     transactionCore.getCurrency(),
                     transactionCore.getPan(),
                     requestDto.getEmail(),
-                    "Subject--",
+                    "This is system generated transaction e-receipt--",
                     transactionCore.getSignData()
             );
             if (requestDto.getEmail() != null && !"".equals(requestDto.getEmail())) {
@@ -246,11 +273,11 @@ public class TransactionServiceImpl implements TransactionService {
                     transactionCore.getCurrency(),
                     transactionCore.getPan(),
                     eReceipt.getEmail(),
-                    "Subject--",
+                    "This is system generated transaction customer e-receipt--",
                     transactionCore.getSignData()
             );
             if (requestDto.getEmail() != null && !"".equals(requestDto.getEmail())) {
-                emailService.sendEmail(savedEReceipt.getId(),eReceiptCustomer);
+                emailService.sendEmail(savedEReceipt.getId(), eReceiptCustomer);
             }
             if (requestDto.getContactNo() != null && !"".equals(requestDto.getContactNo())) {
                 smsService.sendSms(requestDto.getContactNo(), eReceiptCustomer);
@@ -281,11 +308,11 @@ public class TransactionServiceImpl implements TransactionService {
                     transactionCore.getCurrency(),
                     transactionCore.getPan(),
                     merchant.getEmail(),
-                    "Subject--",
+                    "This is system generated transaction merchant e-receipt--",
                     transactionCore.getSignData()
             );
             if (merchant.getIsEmailEnabled()) {
-                emailService.sendEmail(savedEReceipt.getId(),eReceiptMerchant);
+                emailService.sendEmail(savedEReceipt.getId(), eReceiptMerchant);
             }
             if (merchant.getIsSmsEnabled()) {
                 smsService.sendSms(merchant.getContactNo(), eReceiptMerchant);

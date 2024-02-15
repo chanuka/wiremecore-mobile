@@ -65,7 +65,14 @@ public class TransactionFailedMapper {
         entity.setPaymentMode(dto.getPaymentMode());
         entity.setTraceNo(Integer.parseInt(dto.getTraceNo()));
         entity.setRespCode(Integer.parseInt(dto.getRespCode()));
-
+        entity.setOriAuthCode(dto.getOriAuthCode());
+        entity.setOriBatchNo(dto.getOriBatchNo());
+        entity.setOriRrn(dto.getOriRrn());
+        entity.setOriTranType(dto.getOriTransType());
+        entity.setOriTraceNo(dto.getOriTraceNo());
+        if (dto.getOriDateTime() != null && !dto.getOriDateTime().isEmpty()) {
+            entity.setOriDateTime(dateFormat.parse(dto.getOriDateTime()));
+        }
         return entity;
     }
 }
