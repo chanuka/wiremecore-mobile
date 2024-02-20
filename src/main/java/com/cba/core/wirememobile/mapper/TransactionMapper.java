@@ -4,6 +4,7 @@ import com.cba.core.wirememobile.dto.TransactionRequestDto;
 import com.cba.core.wirememobile.dto.TransactionResponseDto;
 import com.cba.core.wirememobile.model.TransactionCore;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -12,7 +13,7 @@ public class TransactionMapper {
     public static TransactionResponseDto toDto(TransactionCore entity) {
         TransactionResponseDto responseDto = new TransactionResponseDto();
         responseDto.setOriginId(entity.getOriginId());
-        responseDto.setAmount(String.valueOf(entity.getAmount()));
+        responseDto.setAmount(entity.getAmount());
         responseDto.setAuthCode(entity.getAuthCode());
         responseDto.setBatchNo(String.valueOf(entity.getBatchNo()));
         responseDto.setCurrency(entity.getCurrency());
@@ -43,7 +44,8 @@ public class TransactionMapper {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 
         TransactionCore entity = new TransactionCore();
-        entity.setAmount(Integer.parseInt(dto.getAmount()));
+        entity.setAmount(dto.getAmount().divide(BigDecimal.valueOf(100)));
+        entity.setTipAmount(dto.getTipAmount().divide(BigDecimal.valueOf(100)));
         entity.setAuthCode(dto.getAuthCode());
         entity.setBatchNo(Integer.parseInt(dto.getBatchNo()));
         entity.setCardLabel(dto.getCardLabel());

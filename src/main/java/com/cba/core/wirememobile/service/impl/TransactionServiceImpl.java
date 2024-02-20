@@ -81,7 +81,7 @@ public class TransactionServiceImpl implements TransactionService {
                     settleObj.getMerchantId(), settleObj.getTerminalId(), settleObj.getBatchNo());
 
             SettlementEmailDto settlementEmailDto = new SettlementEmailDto();
-            settlementEmailDto.setSubject("This is system generated settlement e-receipt");
+            settlementEmailDto.setSubject("Wire-me Settlement Report with TID :" + terminal.getTerminalId());
             settlementEmailDto.setMid(merchant.getMerchantId());
             settlementEmailDto.setTid(terminal.getTerminalId());
             settlementEmailDto.setMerchantName(merchant.getName());
@@ -138,7 +138,7 @@ public class TransactionServiceImpl implements TransactionService {
                     transactionCore.getMerchantId(),
                     transactionCore.getTerminalId(),
                     transactionCore.getAmount(),
-                    "2023-07-31 07:16:02",
+                    transactionCore.getDateTime().toString(),
                     transactionCore.getTranType(),
                     transactionCore.getCardLabel(),
                     transactionCore.getExpDate(),
@@ -149,7 +149,7 @@ public class TransactionServiceImpl implements TransactionService {
                     transactionCore.getCurrency(),
                     transactionCore.getPan(),
                     requestDto.getEmail(),
-                    "This is system generated transaction e-receipt--",
+                    "Wire-me Transaction Receipt(Customer)",
                     transactionCore.getSignData()
             );
             if (eReceipt.getEmail() != null && !"".equals(eReceipt.getEmail())) {
@@ -184,7 +184,7 @@ public class TransactionServiceImpl implements TransactionService {
                     transactionCore.getMerchantId(),
                     transactionCore.getTerminalId(),
                     transactionCore.getAmount(),
-                    "2023-07-31 07:16:02",
+                    transactionCore.getDateTime().toString(),
                     transactionCore.getTranType(),
                     transactionCore.getCardLabel(),
                     transactionCore.getExpDate(),
@@ -195,7 +195,7 @@ public class TransactionServiceImpl implements TransactionService {
                     transactionCore.getCurrency(),
                     transactionCore.getPan(),
                     requestDto.getEmail(),
-                    "This is system generated transaction e-receipt--",
+                    "Wire-me Transaction Receipt(Customer)",
                     transactionCore.getSignData()
             );
             if (requestDto.getEmail() != null && !"".equals(requestDto.getEmail())) {
@@ -256,7 +256,7 @@ public class TransactionServiceImpl implements TransactionService {
                     transactionCore.getMerchantId(),
                     transactionCore.getTerminalId(),
                     transactionCore.getAmount(),
-                    "2023-07-31 07:16:02",
+                    transactionCore.getDateTime().toString(),
                     transactionCore.getTranType(),
                     transactionCore.getCardLabel(),
                     transactionCore.getExpDate(),
@@ -267,7 +267,7 @@ public class TransactionServiceImpl implements TransactionService {
                     transactionCore.getCurrency(),
                     transactionCore.getPan(),
                     eReceipt.getEmail(),
-                    "This is system generated transaction customer e-receipt--",
+                    "Wire-me Transaction Receipt(Customer)",
                     transactionCore.getSignData()
             );
             if (requestDto.getEmail() != null && !"".equals(requestDto.getEmail())) {
@@ -291,7 +291,7 @@ public class TransactionServiceImpl implements TransactionService {
                     transactionCore.getMerchantId(),
                     transactionCore.getTerminalId(),
                     transactionCore.getAmount(),
-                    "2023-07-31 07:16:02",
+                    transactionCore.getDateTime().toString(),
                     transactionCore.getTranType(),
                     transactionCore.getCardLabel(),
                     transactionCore.getExpDate(),
@@ -302,7 +302,7 @@ public class TransactionServiceImpl implements TransactionService {
                     transactionCore.getCurrency(),
                     transactionCore.getPan(),
                     merchant.getEmail(),
-                    "This is system generated transaction merchant e-receipt--",
+                    "Wire-me Transaction Receipt(Merchant)",
                     transactionCore.getSignData()
             );
             if (merchant.getIsEmailEnabled()) {

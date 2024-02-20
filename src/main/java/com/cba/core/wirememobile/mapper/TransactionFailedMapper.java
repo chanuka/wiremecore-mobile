@@ -11,7 +11,7 @@ public class TransactionFailedMapper {
 
     public static TransactionResponseDto toDto(TransactionCoreFailed entity) {
         TransactionResponseDto responseDto = new TransactionResponseDto();
-        responseDto.setAmount(String.valueOf(entity.getAmount()));
+        responseDto.setAmount(entity.getAmount());
         responseDto.setAuthCode(entity.getAuthCode());
         responseDto.setBatchNo(String.valueOf(entity.getBatchNo()));
         responseDto.setCurrency(entity.getCurrency());
@@ -40,7 +40,7 @@ public class TransactionFailedMapper {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 
         TransactionCoreFailed entity = new TransactionCoreFailed();
-        entity.setAmount(Integer.parseInt(dto.getAmount()));
+        entity.setAmount(dto.getAmount());
         entity.setAuthCode(dto.getAuthCode());
         entity.setBatchNo(Integer.parseInt(dto.getBatchNo()));
         entity.setCardLabel(dto.getCardLabel());
@@ -64,7 +64,7 @@ public class TransactionFailedMapper {
         entity.setSignData(dto.getSignData());
         entity.setPaymentMode(dto.getPaymentMode());
         entity.setTraceNo(Integer.parseInt(dto.getTraceNo()));
-        entity.setRespCode(Integer.parseInt(dto.getRespCode()));
+        entity.setRespCode(dto.getRespCode());
         entity.setOriAuthCode(dto.getOriAuthCode());
         entity.setOriBatchNo(dto.getOriBatchNo());
         entity.setOriRrn(dto.getOriRrn());

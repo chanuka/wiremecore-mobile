@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
@@ -27,8 +28,8 @@ public class TransactionResponseDto implements Serializable {
     private String merchantId;
     private String traceNo;
     private String invoiceNo;
-    private String amount;
-    private String tipAmount;
+    private BigDecimal amount;
+    private BigDecimal tipAmount;
     private String currency;
     private String batchNo;
     private String pan;

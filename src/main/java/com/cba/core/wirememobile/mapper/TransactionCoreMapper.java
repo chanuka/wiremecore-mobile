@@ -8,6 +8,7 @@ public class TransactionCoreMapper {
     public static TransactionCoreResponseDto toDto(TransactionCore entity) {
         TransactionCoreResponseDto responseDto = new TransactionCoreResponseDto();
         responseDto.setAmount(entity.getAmount());
+        responseDto.setTipAmount(entity.getTipAmount());
         responseDto.setAuthCode(entity.getAuthCode());
         responseDto.setBatchNo(entity.getBatchNo());
         responseDto.setCardLabel(entity.getCardLabel());

@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,7 +18,7 @@ public class EReceiptDataDto {
     private String merchantAddress;
     private String mid;
     private String tid;
-    private Integer amount;
+    private BigDecimal amount;
     private String timestamp;
     private String transType;
     private String cardLabel;

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
@@ -23,9 +24,9 @@ public class TransactionRequestDto implements Serializable {
     private String paymentMode;
     @NotBlank(message = "{validation.transaction.device_serial.empty}")
     private String deviceSerialNo;
-//    @NotBlank(message = "{validation.transaction.unique_id.empty}")
+    //    @NotBlank(message = "{validation.transaction.unique_id.empty}")
     private String uniqueId;
-//    @NotBlank(message = "{validation.transaction.cust_mobile.empty}")
+    //    @NotBlank(message = "{validation.transaction.cust_mobile.empty}")
     private String custMobile;
     @NotBlank(message = "{validation.transaction.trans_type.empty}")
     private String transType;
@@ -39,9 +40,9 @@ public class TransactionRequestDto implements Serializable {
     private String traceNo;
     @NotBlank(message = "{validation.transaction.invoice_no.empty}")
     private String invoiceNo;
-    @NotBlank(message = "{validation.transaction.amount.empty}")
-    private String amount;
-    private String tipAmount;
+    @NotNull(message = "{validation.transaction.amount.empty}")
+    private BigDecimal amount;
+    private BigDecimal tipAmount;
     @NotBlank(message = "{validation.transaction.currency.empty}")
     private String currency;
     @NotBlank(message = "{validation.transaction.batch_no.empty}")
