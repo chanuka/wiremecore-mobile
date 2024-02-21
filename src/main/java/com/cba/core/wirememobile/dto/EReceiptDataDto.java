@@ -18,7 +18,7 @@ public class EReceiptDataDto {
     private String merchantAddress;
     private String mid;
     private String tid;
-    private BigDecimal amount;
+    private String amount;
     private String timestamp;
     private String transType;
     private String cardLabel;

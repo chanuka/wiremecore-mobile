@@ -19,11 +19,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Transactional
@@ -131,13 +129,19 @@ public class TransactionServiceImpl implements TransactionService {
                     requestDto.getContactNo(), "customer_copy", false, false);
             savedEReceipt = eReceiptDao.create(eReceipt);
 
+            DecimalFormat currencyFormat = new DecimalFormat("#,##0.00");
+            String formattedAmount = currencyFormat.format(transactionCore.getAmount());
+            List<String> values = Arrays.asList("void-sale", "void-offline", "void-precomp", "void-preauth");
+            if (values.stream().anyMatch(transactionCore.getTranType()::equals)) {
+                formattedAmount = "-" + formattedAmount;
+            }
             EReceiptDataDto eReceiptCustomer = new EReceiptDataDto(
                     "card-holder-copy",
                     merchant.getName(),
                     merchant.getDistrict(),
                     transactionCore.getMerchantId(),
                     transactionCore.getTerminalId(),
-                    transactionCore.getAmount(),
+                    formattedAmount,
                     transactionCore.getDateTime().toString(),
                     transactionCore.getTranType(),
                     transactionCore.getCardLabel(),
@@ -177,13 +181,19 @@ public class TransactionServiceImpl implements TransactionService {
             eReceipt = new EReceipt(transactionCore, requestDto.getEmail(), requestDto.getContactNo(), "customer_copy", false, false);
             savedEReceipt = eReceiptDao.create(eReceipt);
 
+            DecimalFormat currencyFormat = new DecimalFormat("#,##0.00");
+            String formattedAmount = currencyFormat.format(transactionCore.getAmount());
+            List<String> values = Arrays.asList("void-sale", "void-offline", "void-precomp", "void-preauth");
+            if (values.stream().anyMatch(transactionCore.getTranType()::equals)) {
+                formattedAmount = "-" + formattedAmount;
+            }
             EReceiptDataDto eReceiptCustomer = new EReceiptDataDto(
                     "card-holder-copy",
                     merchant.getName(),
                     merchant.getDistrict(),
                     transactionCore.getMerchantId(),
                     transactionCore.getTerminalId(),
-                    transactionCore.getAmount(),
+                    formattedAmount,
                     transactionCore.getDateTime().toString(),
                     transactionCore.getTranType(),
                     transactionCore.getCardLabel(),
@@ -249,13 +259,20 @@ public class TransactionServiceImpl implements TransactionService {
             eReceipt = new EReceipt(transactionCore, requestDto.getEmail(), requestDto.getContactNo(), "customer_copy", false, false);
             savedEReceipt = eReceiptDao.create(eReceipt);
 
+            DecimalFormat currencyFormat = new DecimalFormat("#,##0.00");
+            String formattedAmount = currencyFormat.format(transactionCore.getAmount());
+
+            List<String> values = Arrays.asList("void-sale", "void-offline", "void-precomp", "void-preauth");
+            if (values.stream().anyMatch(transactionCore.getTranType()::equals)) {
+                formattedAmount = "-" + formattedAmount;
+            }
             EReceiptDataDto eReceiptCustomer = new EReceiptDataDto(
                     "card-holder-copy",
                     merchant.getName(),
                     merchant.getDistrict(),
                     transactionCore.getMerchantId(),
                     transactionCore.getTerminalId(),
-                    transactionCore.getAmount(),
+                    formattedAmount,
                     transactionCore.getDateTime().toString(),
                     transactionCore.getTranType(),
                     transactionCore.getCardLabel(),
@@ -284,13 +301,19 @@ public class TransactionServiceImpl implements TransactionService {
             eReceipt = new EReceipt(transactionCore, merchant.getEmail(), merchant.getContactNo(), "merchant_copy", false, false);
             savedEReceipt = eReceiptDao.create(eReceipt);
 
+            DecimalFormat currencyFormat = new DecimalFormat("#,##0.00");
+            String formattedAmount = currencyFormat.format(transactionCore.getAmount());
+            List<String> values = Arrays.asList("void-sale", "void-offline", "void-precomp", "void-preauth");
+            if (values.stream().anyMatch(transactionCore.getTranType()::equals)) {
+                formattedAmount = "-" + formattedAmount;
+            }
             EReceiptDataDto eReceiptMerchant = new EReceiptDataDto(
                     "merchant-copy",
                     merchant.getName(),
                     merchant.getDistrict(),
                     transactionCore.getMerchantId(),
                     transactionCore.getTerminalId(),
-                    transactionCore.getAmount(),
+                    formattedAmount,
                     transactionCore.getDateTime().toString(),
                     transactionCore.getTranType(),
                     transactionCore.getCardLabel(),
