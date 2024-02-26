@@ -33,7 +33,7 @@ public class TransactionController implements TransactionResource {
     @Override
     public ResponseEntity<String> generateEReceipt(EReceiptRequestDto requestDto) throws Exception {
         Locale currentLocale = LocaleContextHolder.getLocale();
-        logger.debug(messageSource.getMessage("TRANSACTION_POST_E-RECEIPT_DEBUG", null, currentLocale));
+        logger.debug(messageSource.getMessage("TRANSACTION_POST_E-RECEIPT_BY_REQUEST_BODY_DEBUG", null, currentLocale));
         try {
             String response = transactionService.generateEReceipt(requestDto);
             return ResponseEntity.ok().body(response);
@@ -46,7 +46,7 @@ public class TransactionController implements TransactionResource {
     @Override
     public ResponseEntity<String> generateEReceipt(int id, EReceiptMiniRequestDto requestDto) throws Exception {
         Locale currentLocale = LocaleContextHolder.getLocale();
-        logger.debug(messageSource.getMessage("TRANSACTION_POST_E-RECEIPT_DEBUG", null, currentLocale));
+        logger.debug(messageSource.getMessage("TRANSACTION_POST_E-RECEIPT_BY_ID_DEBUG", null, currentLocale));
         try {
             String response = transactionService.generateEReceipt(id,requestDto);
             return ResponseEntity.ok().body(response);
@@ -63,7 +63,7 @@ public class TransactionController implements TransactionResource {
                                                                                                       String originId,
                                                                                                       String deviceSerial) throws Exception {
         Locale currentLocale = LocaleContextHolder.getLocale();
-        logger.debug(messageSource.getMessage("TRANSACTION_GET_SUMMARY_DEBUG", null, currentLocale));
+        logger.debug(messageSource.getMessage("TRANSACTION_GET_SUMMARY_BY_DEVICE_DEBUG", null, currentLocale));
         try {
             Map<String, ArrayList<Map<String, Object>>> responseDtolist = transactionService.getAllTransactionSummary(dateFrom, dateTo, queryBy);
             return ResponseEntity.ok().body(responseDtolist);
@@ -81,7 +81,7 @@ public class TransactionController implements TransactionResource {
                                                                                                    int isSettled,
                                                                                                    int page, int pageSize) throws Exception {
         Locale currentLocale = LocaleContextHolder.getLocale();
-        logger.debug(messageSource.getMessage("TRANSACTION_GET_ALL_DEBUG", null, currentLocale));
+        logger.debug(messageSource.getMessage("TRANSACTION_GET_ALL_BY_DEVICE_DEBUG", null, currentLocale));
         try {
             Page<TransactionCoreResponseDto> responseDtolist = transactionService.getAllTransactions(dateFrom, dateTo, page, pageSize);
             return ResponseEntity.ok().body(new PaginationResponse<TransactionCoreResponseDto>(responseDtolist.getContent(), responseDtolist.getTotalElements()));
