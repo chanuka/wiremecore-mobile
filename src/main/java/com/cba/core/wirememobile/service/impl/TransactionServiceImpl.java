@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -383,7 +384,7 @@ public class TransactionServiceImpl implements TransactionService {
             Map<String, Object> amountMap = new HashMap<>();
             String label = (String) i[0];
             Long count = (Long) i[1];
-            Long amount = (Long) i[2];
+            BigDecimal amount = (BigDecimal) i[2];
 
             countMap.put("count", count);
             if ((queryBy != null && !"".equals(queryBy))) {

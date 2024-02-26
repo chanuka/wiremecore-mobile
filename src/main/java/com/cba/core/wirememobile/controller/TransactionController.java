@@ -125,7 +125,6 @@ public class TransactionController implements TransactionResource {
             TransactionResponseDto responseDto = transactionService.create(requestDto);
             return ResponseEntity.ok().body(responseDto);
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error(e.getMessage());
             throw e;
         }
