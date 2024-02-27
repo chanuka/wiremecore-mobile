@@ -98,7 +98,7 @@ public class TransactionServiceImpl implements TransactionService {
             settlementDetailEmailDto.setTid(terminal.getTerminalId());
             settlementDetailEmailDto.setMerchantName(merchant.getName());
             settlementDetailEmailDto.setTo(merchant.getEmail());
-            settlementDetailEmailDto.setCurrency(terminal.getCurrency());
+            settlementDetailEmailDto.setCurrency(terminal.getCurrency().getCode());
             settlementDetailEmailDto.setCc("");
             settlementDetailEmailDto.setMerchantAddress(merchant.getAddress());
             settlementDetailEmailDto.setSettledDate(new Date().toString());
