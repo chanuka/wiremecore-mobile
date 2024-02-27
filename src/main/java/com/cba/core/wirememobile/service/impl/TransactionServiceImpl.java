@@ -3,6 +3,7 @@ package com.cba.core.wirememobile.service.impl;
 import com.cba.core.wirememobile.dao.*;
 import com.cba.core.wirememobile.dto.*;
 import com.cba.core.wirememobile.exception.NotFoundException;
+import com.cba.core.wirememobile.mapper.TransactionCoreEmailMapper;
 import com.cba.core.wirememobile.mapper.TransactionCoreMapper;
 import com.cba.core.wirememobile.mapper.TransactionFailedMapper;
 import com.cba.core.wirememobile.mapper.TransactionMapper;
@@ -13,6 +14,7 @@ import com.cba.core.wirememobile.service.SmsService;
 import com.cba.core.wirememobile.service.TransactionService;
 import com.cba.core.wirememobile.util.DeviceTypeEnum;
 import com.cba.core.wirememobile.util.SettlementMethodEnum;
+import com.cba.core.wirememobile.util.StatusVarList;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +25,7 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -47,7 +50,7 @@ public class TransactionServiceImpl implements TransactionService {
         }
         Device device = deviceDao.findBySerialNo(requestDto.getDeviceSerialNo());
 
-        if (!"ACTV".equals(device.getStatus().getStatusCode())) {
+        if (!StatusVarList.ACTIVE_STATUS_CODE.equals(device.getStatus().getStatusCode())) {
             throw new NotFoundException("Device is not Active");
         }
 
@@ -65,10 +68,10 @@ public class TransactionServiceImpl implements TransactionService {
 
             Merchant merchant = merchantDao.findByMerchantId(settleObj.getMerchantId());
 
-            if (!"ACTV".equals(merchant.getStatus().getStatusCode())) {
+            if (!StatusVarList.ACTIVE_STATUS_CODE.equals(merchant.getStatus().getStatusCode())) {
                 throw new NotFoundException("Merchant is not Active");
             }
-            if (!"ACTV".equals(terminal.getStatus().getStatusCode())) {
+            if (!StatusVarList.ACTIVE_STATUS_CODE.equals(terminal.getStatus().getStatusCode())) {
                 throw new NotFoundException("Terminal is not Active");
             }
             if (settleObj.getSettledMethod() != SettlementMethodEnum.AUTO.getValue() &&
@@ -79,29 +82,68 @@ public class TransactionServiceImpl implements TransactionService {
             transactionDao.updateRecordsWithCondition(true, settleObj.getSettledMethod(), requestDto.getOriginId(),
                     settleObj.getMerchantId(), settleObj.getTerminalId(), settleObj.getBatchNo());
 
-            SettlementEmailDto settlementEmailDto = new SettlementEmailDto();
-            settlementEmailDto.setSubject("Wire-me Settlement Report with TID :" + terminal.getTerminalId());
-            settlementEmailDto.setMid(merchant.getMerchantId());
-            settlementEmailDto.setTid(terminal.getTerminalId());
-            settlementEmailDto.setMerchantName(merchant.getName());
-            settlementEmailDto.setTo(merchant.getEmail());
-            settlementEmailDto.setMerchantAddress(merchant.getAddress());
-            settlementEmailDto.setTimestamp("");
-            settlementEmailDto.setAmount(settleObj.getSaleAmount().toString());
-            settlementEmailDto.setBatchNo(settleObj.getBatchNo());
-            settlementEmailDto.setSaleAmount(settleObj.getSaleAmount());
-            settlementEmailDto.setSaleCount(settleObj.getSaleCount());
-            settlementEmailDto.setSaleVoidAmount(settleObj.getSaleVoidAmount());
-            settlementEmailDto.setSaleVoidCount(settleObj.getSaleVoidCount());
-            settlementEmailDto.setPrecompAmount(settleObj.getPrecompAmount());
-            settlementEmailDto.setPrecompCount(settleObj.getPrecompCount());
-            settlementEmailDto.setPrecompVoidAmount(settleObj.getPrecompVoidAmount());
-            settlementEmailDto.setPrecompVoidCount(settleObj.getPrecompVoidCount());
-            settlementEmailDto.setOfflineAmount(settleObj.getOfflineAmount());
-            settlementEmailDto.setOfflineCount(settleObj.getOfflineCount());
-            settlementEmailDto.setOfflineVoidAmount(settleObj.getOfflineVoidAmount());
-            settlementEmailDto.setOfflineVoidCount(settleObj.getOfflineVoidCount());
-            emailService.sendEmail(settlementEmailDto);
+            List<TransactionCore> transactionList = transactionDao.getAllTransactionsByMerchantIdAndTerminalIdAndBatchNoAndOriginId(
+                    settleObj.getMerchantId(), settleObj.getTerminalId(), settleObj.getBatchNo(), requestDto.getOriginId()
+            );
+
+            List<SettlementDetailTranEmailDto> settlementDetailTranEmailList = transactionList
+                    .stream()
+                    .map(TransactionCoreEmailMapper::toDto)
+                    .collect(Collectors.toList());
+
+
+            SettlementDetailEmailDto settlementDetailEmailDto = new SettlementDetailEmailDto();
+            settlementDetailEmailDto.setSubject("Wire-me Settlement Report with TID :" + terminal.getTerminalId());
+            settlementDetailEmailDto.setMid(merchant.getMerchantId());
+            settlementDetailEmailDto.setTid(terminal.getTerminalId());
+            settlementDetailEmailDto.setMerchantName(merchant.getName());
+            settlementDetailEmailDto.setTo(merchant.getEmail());
+            settlementDetailEmailDto.setCurrency(terminal.getCurrency());
+            settlementDetailEmailDto.setCc("");
+            settlementDetailEmailDto.setMerchantAddress(merchant.getAddress());
+            settlementDetailEmailDto.setSettledDate(new Date().toString());
+            settlementDetailEmailDto.setAmount(settleObj.getSaleAmount().toString());
+            settlementDetailEmailDto.setBatchNo(settleObj.getBatchNo());
+            settlementDetailEmailDto.setSaleAmount(settleObj.getSaleAmount());
+            settlementDetailEmailDto.setSaleCount(settleObj.getSaleCount());
+            settlementDetailEmailDto.setSaleVoidAmount(settleObj.getSaleVoidAmount());
+            settlementDetailEmailDto.setSaleVoidCount(settleObj.getSaleVoidCount());
+            settlementDetailEmailDto.setPrecompAmount(settleObj.getPrecompAmount());
+            settlementDetailEmailDto.setPrecompCount(settleObj.getPrecompCount());
+            settlementDetailEmailDto.setPrecompVoidAmount(settleObj.getPrecompVoidAmount());
+            settlementDetailEmailDto.setPrecompVoidCount(settleObj.getPrecompVoidCount());
+            settlementDetailEmailDto.setOfflineAmount(settleObj.getOfflineAmount());
+            settlementDetailEmailDto.setOfflineCount(settleObj.getOfflineCount());
+            settlementDetailEmailDto.setOfflineVoidAmount(settleObj.getOfflineVoidAmount());
+            settlementDetailEmailDto.setOfflineVoidCount(settleObj.getOfflineVoidCount());
+            settlementDetailEmailDto.setTranList(settlementDetailTranEmailList);
+
+            emailService.sendEmail(settlementDetailEmailDto);
+
+
+//            SettlementEmailDto settlementEmailDto = new SettlementEmailDto();
+//            settlementEmailDto.setSubject("Wire-me Settlement Report with TID :" + terminal.getTerminalId());
+//            settlementEmailDto.setMid(merchant.getMerchantId());
+//            settlementEmailDto.setTid(terminal.getTerminalId());
+//            settlementEmailDto.setMerchantName(merchant.getName());
+//            settlementEmailDto.setTo(merchant.getEmail());
+//            settlementEmailDto.setMerchantAddress(merchant.getAddress());
+//            settlementEmailDto.setTimestamp(new Date().toString());
+//            settlementEmailDto.setAmount(settleObj.getSaleAmount().toString());
+//            settlementEmailDto.setBatchNo(settleObj.getBatchNo());
+//            settlementEmailDto.setSaleAmount(settleObj.getSaleAmount());
+//            settlementEmailDto.setSaleCount(settleObj.getSaleCount());
+//            settlementEmailDto.setSaleVoidAmount(settleObj.getSaleVoidAmount());
+//            settlementEmailDto.setSaleVoidCount(settleObj.getSaleVoidCount());
+//            settlementEmailDto.setPrecompAmount(settleObj.getPrecompAmount());
+//            settlementEmailDto.setPrecompCount(settleObj.getPrecompCount());
+//            settlementEmailDto.setPrecompVoidAmount(settleObj.getPrecompVoidAmount());
+//            settlementEmailDto.setPrecompVoidCount(settleObj.getPrecompVoidCount());
+//            settlementEmailDto.setOfflineAmount(settleObj.getOfflineAmount());
+//            settlementEmailDto.setOfflineCount(settleObj.getOfflineCount());
+//            settlementEmailDto.setOfflineVoidAmount(settleObj.getOfflineVoidAmount());
+//            settlementEmailDto.setOfflineVoidCount(settleObj.getOfflineVoidCount());
+//            emailService.sendEmail(settlementEmailDto);
 
         });
 

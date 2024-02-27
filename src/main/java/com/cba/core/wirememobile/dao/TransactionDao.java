@@ -17,8 +17,13 @@ public interface TransactionDao {
 
     TransactionCoreFailed createFailed(TransactionCoreFailed toInsert) throws Exception;
 
-    int updateRecordsWithCondition(boolean isSettled,int settledMethod,String originId,String merchantId,
-                                   String terminalId,int batchNo) throws RuntimeException;
+    List<TransactionCore> getAllTransactionsByMerchantIdAndTerminalIdAndBatchNoAndOriginId(String merchantId,
+                                                                                           String terminalId,
+                                                                                           int batchNo,
+                                                                                           String originId) throws RuntimeException;
+
+    int updateRecordsWithCondition(boolean isSettled, int settledMethod, String originId, String merchantId,
+                                   String terminalId, int batchNo) throws RuntimeException;
 
     Page<TransactionCore> getAllTransactions(String dateFrom, String dateTo, int page, int pageSize) throws Exception;
 

@@ -57,6 +57,11 @@ public class TransactionDaoImpl implements TransactionDao {
     }
 
     @Override
+    public List<TransactionCore> getAllTransactionsByMerchantIdAndTerminalIdAndBatchNoAndOriginId(String merchantId, String terminalId, int batchNo, String originId) throws RuntimeException {
+        return transactionRepository.findAllByMerchantIdAndTerminalIdAndBatchNoAndOriginId(merchantId, terminalId, batchNo, originId);
+    }
+
+    @Override
     public int updateRecordsWithCondition(boolean isSettled, int settledMethod, String originId, String merchantId,
                                           String terminalId, int batchNo) throws RuntimeException {
         return transactionRepository.updateRecordsWithCondition(true, settledMethod, originId,

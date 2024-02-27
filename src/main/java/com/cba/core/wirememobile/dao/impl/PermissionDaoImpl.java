@@ -21,14 +21,14 @@ public class PermissionDaoImpl implements PermissionDao {
     private final PermissionRepository repository;
 
     @Override
-    @Cacheable("permissions")
+//    @Cacheable("permissions")
     public Page<Permission> findAll(int page, int pageSize) throws Exception {
         Pageable pageable = PageRequest.of(page, pageSize);
         return repository.findAll(pageable);
     }
 
     @Override
-    @Cacheable("permissions")
+//    @Cacheable("permissions")
     public List<Permission> findAll() throws Exception {
         return repository.findAll();
     }

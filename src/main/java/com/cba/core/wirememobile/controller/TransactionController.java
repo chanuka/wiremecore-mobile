@@ -48,7 +48,7 @@ public class TransactionController implements TransactionResource {
         Locale currentLocale = LocaleContextHolder.getLocale();
         logger.debug(messageSource.getMessage("TRANSACTION_POST_E-RECEIPT_BY_ID_DEBUG", null, currentLocale));
         try {
-            String response = transactionService.generateEReceipt(id,requestDto);
+            String response = transactionService.generateEReceipt(id, requestDto);
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -65,8 +65,8 @@ public class TransactionController implements TransactionResource {
         Locale currentLocale = LocaleContextHolder.getLocale();
         logger.debug(messageSource.getMessage("TRANSACTION_GET_SUMMARY_BY_DEVICE_DEBUG", null, currentLocale));
         try {
-            Map<String, ArrayList<Map<String, Object>>> responseDtolist = transactionService.getAllTransactionSummary(dateFrom, dateTo, queryBy);
-            return ResponseEntity.ok().body(responseDtolist);
+            Map<String, ArrayList<Map<String, Object>>> responseDtoList = transactionService.getAllTransactionSummary(dateFrom, dateTo, queryBy);
+            return ResponseEntity.ok().body(responseDtoList);
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw e;
@@ -83,8 +83,8 @@ public class TransactionController implements TransactionResource {
         Locale currentLocale = LocaleContextHolder.getLocale();
         logger.debug(messageSource.getMessage("TRANSACTION_GET_ALL_BY_DEVICE_DEBUG", null, currentLocale));
         try {
-            Page<TransactionCoreResponseDto> responseDtolist = transactionService.getAllTransactions(dateFrom, dateTo, page, pageSize);
-            return ResponseEntity.ok().body(new PaginationResponse<TransactionCoreResponseDto>(responseDtolist.getContent(), responseDtolist.getTotalElements()));
+            Page<TransactionCoreResponseDto> responseDtoList = transactionService.getAllTransactions(dateFrom, dateTo, page, pageSize);
+            return ResponseEntity.ok().body(new PaginationResponse<>(responseDtoList.getContent(), responseDtoList.getTotalElements()));
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw e;
@@ -136,8 +136,8 @@ public class TransactionController implements TransactionResource {
         Locale currentLocale = LocaleContextHolder.getLocale();
         logger.debug(messageSource.getMessage("TRANSACTION_GET_ALL_DEBUG", null, currentLocale));
         try {
-            Page<TransactionCoreResponseDto> responseDtolist = transactionService.getAllTransactions(dateFrom, dateTo, page, pageSize);
-            return ResponseEntity.ok().body(new PaginationResponse<TransactionCoreResponseDto>(responseDtolist.getContent(), responseDtolist.getTotalElements()));
+            Page<TransactionCoreResponseDto> responseDtoList = transactionService.getAllTransactions(dateFrom, dateTo, page, pageSize);
+            return ResponseEntity.ok().body(new PaginationResponse<>(responseDtoList.getContent(), responseDtoList.getTotalElements()));
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw e;
@@ -151,8 +151,8 @@ public class TransactionController implements TransactionResource {
         Locale currentLocale = LocaleContextHolder.getLocale();
         logger.debug(messageSource.getMessage("TRANSACTION_GET_SUMMARY_DEBUG", null, currentLocale));
         try {
-            Map<String, ArrayList<Map<String, Object>>> responseDtolist = transactionService.getAllTransactionSummary(dateFrom, dateTo, queryBy);
-            return ResponseEntity.ok().body(responseDtolist);
+            Map<String, ArrayList<Map<String, Object>>> responseDtoList = transactionService.getAllTransactionSummary(dateFrom, dateTo, queryBy);
+            return ResponseEntity.ok().body(responseDtoList);
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw e;

@@ -10,11 +10,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 public interface TransactionRepository extends JpaRepository<TransactionCore, Integer>, JpaSpecificationExecutor<TransactionCore> {
 
     Page<TransactionCore> findByDateTimeBetween(Date fromDate, Date toDate, Pageable pageable);
+
+    List<TransactionCore> findAllByMerchantIdAndTerminalIdAndBatchNoAndOriginId(String merchantId, String terminalId, int batchNo,
+                                                                                String originId);
 
     @Modifying
     @Query("UPDATE TransactionCore e SET e.issettled = :isSettled , e.settledMethod = :settledMethod " +
@@ -25,6 +29,6 @@ public interface TransactionRepository extends JpaRepository<TransactionCore, In
 
     @Query("SELECT e FROM TransactionCore e inner join Terminal t on e.terminalId=t.terminalId inner join Device d on t.device.id=d.id " +
             "WHERE d.serialNo = :serialNo AND e.rrn = :rrn AND e.invoiceNo = :invoiceNo AND e.traceNo = :traceNo AND e.dateTime= :dateTime")
-    Optional<TransactionCore> findByRrnAndInvoiceNoAndTraceNo(String serialNo, String rrn, Integer invoiceNo, Integer traceNo,Date dateTime);
+    Optional<TransactionCore> findByRrnAndInvoiceNoAndTraceNo(String serialNo, String rrn, Integer invoiceNo, Integer traceNo, Date dateTime);
 
 }

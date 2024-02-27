@@ -2,6 +2,7 @@ package com.cba.core.wirememobile.service.impl;
 
 import com.cba.core.wirememobile.dto.EReceiptDataDto;
 import com.cba.core.wirememobile.dto.EmailRequestDto;
+import com.cba.core.wirememobile.dto.SettlementDetailEmailDto;
 import com.cba.core.wirememobile.dto.SettlementEmailDto;
 import com.cba.core.wirememobile.exception.NotFoundException;
 import com.cba.core.wirememobile.model.EReceipt;
@@ -103,6 +104,33 @@ public class EmailServiceImpl implements EmailService {
 
             HttpEntity<SettlementEmailDto> requestEntity = new HttpEntity<>(settlementEmailDto, headers);
             ResponseEntity<String> response = restTemplate.postForEntity(emailUrl + "/settlement-email", requestEntity, String.class);
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                String responseData = response.getBody();
+                // Process responseData here
+                System.out.println("Response: " + responseData);
+
+//                EReceipt eReceipt = eReceiptRepository.findById(id).orElseThrow(() -> new NotFoundException("e-Receipt Info Not Found"));
+//                eReceipt.setIs_sent_mail(true);
+//                eReceiptRepository.save(eReceipt);
+            } else {
+                System.out.println("Error occurred. Status code: " + response.getStatusCode().value());
+                // Handle other error cases
+            }
+        } catch (Exception ex) {
+            System.out.println("Error occurred: " + ex.getMessage());
+            // Handle exceptions
+        }
+    }
+
+    @Override
+    public void sendEmail(SettlementDetailEmailDto settlementDetailEmailDto) throws RuntimeException {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<SettlementDetailEmailDto> requestEntity = new HttpEntity<>(settlementDetailEmailDto, headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(emailUrl + "/detail-settlement-email", requestEntity, String.class);
 
             if (response.getStatusCode().is2xxSuccessful()) {
                 String responseData = response.getBody();
