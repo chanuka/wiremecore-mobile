@@ -1,5 +1,6 @@
 package com.cba.core.wirememobile.model;
 
+
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,12 @@ public class Bank implements java.io.Serializable {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "bank")
     private Set<TransactionSwitch> transactionSwitches = new HashSet<TransactionSwitch>(0);
 
+    public Bank(String bankCode) {
+        this.bankCode = bankCode;
+    }
 }
+
+
+
 
 
